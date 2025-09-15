@@ -9,6 +9,9 @@ import Urlmodal from '../modals_components/urlmodal';
 import './registration.css'
 
 
+ // registration 컴포넌트 정의 및 내보내기
+ // App.js에서 component = <Registration mode={mode}/>; 가 실행될 때 이 컴포넌트가 렌더링됨
+
 // Registration 컴포넌트 정의 및 내보내기
 export default function Registration(props) {
 

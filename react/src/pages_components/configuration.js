@@ -3,11 +3,13 @@ import './configuration.css'
 import Resultmodal from '../modals_components/resultmodal';
 import { useState } from 'react'
 
+// Configuration 컴포넌트 정의 및 내보내기
+// App.js에서 component = <Configuration mode={mode}/>; 가 실행될 때 이 컴포넌트가 렌더링됨
 export default function Configuration({mode}) {
+  // variables for the checkboxes
   const [eventChecked, setEventChecked] = useState(false);
   const [conditionChecked, setConditionChecked] = useState(false);
   const [actionChecked, setActionChecked] = useState(false);
-
   const [openModal, setOpenModal] = useState(false);
 
 const [PolicyName, setPolicyName]= useState("");

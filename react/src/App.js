@@ -64,7 +64,7 @@ function App() {
       component = <Home /> // Home 컴포넌트 렌더링 및 component 변수에 할당
       break;
     case '/registration':
-      component = < Registration mode={mode}/>; // mode는 props로 함수로 전달
+      component = <Registration mode={mode}/>; // mode는 props로 함수로 전달
       break;
     case '/configuration':
       component = <Configuration mode={mode}/>; // mode는 props로 함수로 전달
