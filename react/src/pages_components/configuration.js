@@ -6,116 +6,128 @@ import { useState } from 'react'
 // Configuration 컴포넌트 정의 및 내보내기
 // App.js에서 component = <Configuration mode={mode}/>; 가 실행될 때 이 컴포넌트가 렌더링됨
 export default function Configuration({mode}) {
-  // variables for the checkboxes
+  
+  // 기본적으로 event, condition, action 박스는 닫혀있고, 체크박스를 클릭하면 열림
   const [eventChecked, setEventChecked] = useState(false);
   const [conditionChecked, setConditionChecked] = useState(false);
   const [actionChecked, setActionChecked] = useState(false);
+  
+  // 모달 창 열림 상태 관리
   const [openModal, setOpenModal] = useState(false);
 
-const [PolicyName, setPolicyName]= useState("");
-const [PolicyLanguage, setPolicyLanguage] = useState("");
-const [ResolutionStrategy, setResolutionStrategy]= useState("")
+// Policy
+const [PolicyName, setPolicyName]= useState(""); // Policy의 Name 변수
+const [PolicyLanguage, setPolicyLanguage] = useState(""); // Policy의 Language 변수
+const [ResolutionStrategy, setResolutionStrategy]= useState("") // Policy의 Resolution Strategy 변수
 
 // Rule
-const [RuleName, setRuleName] = useState("");
-const [PriorityName, setPriorityName] = useState("");
-const [SystemEvent, setSystemEvent] = useState("");
-const [Systemevent, setSystemAlarm] = useState("");
+const [RuleName, setRuleName] = useState(""); // Rule의 Name 변수
+const [PriorityName, setPriorityName] = useState(""); // Rule의 Priority 변수
+
+// Event
+const [SystemEvent, setSystemEvent] = useState(""); // Event의 System Event 변수
+const [Systemevent, setSystemAlarm] = useState(""); // Event의 System Alarm 변수
 
 //Condition
-const [FirewallSource, setFirewallSource] = useState("");
-const [FirewallDest, setFirewallDest] = useState("");
-const [FirewallSystemAlarm, setFirewallSystemAlarm] = useState("");
-const [FirewallStartPortNum, setFirewallStartPortNum] = useState("");
-const [FirewallEndPortNum, setFirewallEndPortNum] = useState("");
-const [FirewallIcmpMessage, setFirewallIcmpmessage] = useState("");
+const [FirewallSource, setFirewallSource] = useState(""); // Firewall의 Source 변수
+const [FirewallDest, setFirewallDest] = useState(""); // Firewall의 Destination 변수
+const [FirewallStartPortNum, setFirewallStartPortNum] = useState(""); // Firewall의 Start Port Number 변수
+const [FirewallEndPortNum, setFirewallEndPortNum] = useState(""); // Firewall의 End Port Number 변수
+const [FirewallIcmpMessage, setFirewallIcmpmessage] = useState(""); // Firewall의 ICMP Message 변수
+const [FirewallSystemAlarm, setFirewallSystemAlarm] = useState(""); // Firewall의 System Alarm 변수
 
-// DDOS
-const [DdosPacketRateThreshod, setDdosPacketRateThreshod] = useState("");
-const [DdosByteRateThreshod, setDdosByteRateThreshod] = useState("");
-const [DdosFlowRateThreshod, setDdosFlowRateThreshod] = useState("");
- 
+// Anti-DDOS
+const [DdosPacketRateThreshod, setDdosPacketRateThreshod] = useState(""); // Anti-DDOS의 Packet Rate Threshold 변수
+const [DdosByteRateThreshod, setDdosByteRateThreshod] = useState(""); // Anti-DDOS의 Byte Rate Threshold 변수
+const [DdosFlowRateThreshod, setDdosFlowRateThreshod] = useState(""); // Anti-DDOS의 Flow Rate Threshold 변수
+
 // Antivirus
-const [ExceptionFiles, setExceptionFiles] =useState("");
+const [ExceptionFiles, setExceptionFiles] =useState(""); // Anti-Virus의 Exception Files 변수
 
 // Payload
-const [PayloadContent,setPayloadContent] = useState("")
+const [PayloadContent,setPayloadContent] = useState("") // Payload의 Content 변수
 
 // URL-Categroy
-const [UrlName,setUrlName] = useState("")
+const [UrlName,setUrlName] = useState("") // URL의 Url-name 변수
 
 // Voice
-const [VoiceSourceId,setVoiceSourceId] = useState("")
-const [VoiceDestId,setVoiceDestId] = useState("")
-const [VoiceUserAgent,setVoiceUserAgent] = useState("")
+const [VoiceSourceId,setVoiceSourceId] = useState("") // Voice의 Source Id 변수
+const [VoiceDestId,setVoiceDestId] = useState("") // Voice의 Destination Id 변수
+const [VoiceUserAgent,setVoiceUserAgent] = useState("") // Voice의 User Agent 변수
 
 // Context Time
-const [ContextStartDateTime,setContextStartDateTime] = useState("")
-const [ContextEndDateTime,setContextEndDateTime] = useState("")
+const [ContextStartDateTime,setContextStartDateTime] = useState("") // Context의 Start Date Time 변수
+const [ContextEndDateTime,setContextEndDateTime] = useState("") // Context의 End Date Time 변수
 
 
-
-// variables for the frequency buttons 
+// variables for the frequency buttons
 // only once
-const [frequencyOnlyOnce, setFrequencyOnlyOnce] = useState(false);
-
-const [StartTime, setStartTime] = useState("");
-const [EndTime, setEndTime] = useState("");
-
+const [frequencyOnlyOnce, setFrequencyOnlyOnce] = useState(false); // only-once 선택 상태 변수
+const [StartTime, setStartTime] = useState(""); // only-once 선택시 Frequency의 Start Time 변수
+const [EndTime, setEndTime] = useState(""); // only-once 선택시 Frequency의 End Time 변수
 
 // weekly
-const [frequencyWeekly, setFrequencyWeekly] = useState(false); 
-const [Day, setDay] = useState("");
+const [frequencyWeekly, setFrequencyWeekly] = useState(false); // weekly 선택 상태 변수
+const [Day, setDay] = useState(""); // weekly 선택시 Frequency의 Day 변수
 
 // monthly
-const [frequencyMonthly, setFrequencyMonthly] = useState(false);
-const [MonthlyDay, setMonthlyDay] = useState("");
+const [frequencyMonthly, setFrequencyMonthly] = useState(false); // monthly 선택 상태 변수
+const [MonthlyDay, setMonthlyDay] = useState(""); // monthly 선택시 Frequency의 Day 변수
 
 // yearly
-const [frequencyYearly, setFrequencysYearly] = useState(false);   
-const [YearlyMonth, setYearlyMonth] = useState("");
+const [frequencyYearly, setFrequencysYearly] = useState(false); // yearly 선택 상태 변수
+const [YearlyMonth, setYearlyMonth] = useState(""); // yearly 선택시 Frequency의 Month 변수
+
 
 // Application
-const [ApplicationProtocal,setApplicationProtocal] = useState("")
+const [ApplicationProtocal,setApplicationProtocal] = useState("") // Application의 Protocal 변수
 
 // Device Type
-const [DeviceType,setDeviceType] = useState("")
+const [DeviceType,setDeviceType] = useState("") // Device Type의 Device 변수
 
 //User
-const [UserID, setUserID] = useState();
-const [UserName, setUserName] = useState();
+const [UserID, setUserID] = useState();     // User 클릭시 User ID 변수
+const [UserName, setUserName] = useState(); // User 클릭시 User Name 변수
 
 // Group
-const [GroupID, setGroupID] = useState();
-const [GroupName, setGroupName] = useState();
+const [GroupID, setGroupID] = useState();   // Group 클릭시 Group ID 변수
+const [GroupName, setGroupName] = useState(); // Group 클릭시 Group Name 변수
 
 
 // variables for the users radio buttons 
-const [oneUser, setOneUser] = useState(false);
+const [oneUser, setOneUser] = useState(false); //
 const [groupUser, setGroupUser] = useState(false);
 
+
 // Geograpghic Location
-const [GeoSource, setGeoSource] = useState("");
-const [GeoDest, setGeoDest] = useState("");
+const [GeoSource, setGeoSource] = useState(""); // Geographic Location의 Source 변수
+const [GeoDest, setGeoDest] = useState(""); // Geographic Location의 Destination 변수
 
 // Thread-Feed
-const [ThreadName, setThreadName] = useState("");
+const [ThreadName, setThreadName] = useState(""); // Thread-Feed의 Name 변수
 
-// Action
-const [PrimaryAction, setPrimaryAction ] = useState("");
-const [SeciondaryAction, setSecondaryAction ] = useState("");
+// Action 체크박스 클릭 시 열리는 Action 박스 안의 변수들
+const [PrimaryAction, setPrimaryAction ] = useState(""); // Action의 Primary Action 변수
+const [SeciondaryAction, setSecondaryAction ] = useState(""); // Action의 Secondary Action 변수
 
+
+// Event 체크박스 클릭 시 상태 변경 함수
 const handleEventCheck = () => {
   setEventChecked(!eventChecked);
 };
 
+// Condition 체크박스 클릭 시 상태 변경 함수
 const handleConditionCheck = () => {
   setConditionChecked(!conditionChecked);
 };
 
+// Action 체크박스 클릭 시 상태 변경 함수
 const handleActionCheck = () => {
   setActionChecked(!actionChecked);
 };
+
+
+
 
 const [Policy_infos_form, setPolicyInfosform] = useState({
   "i2nsf-cfi-policy": { 
