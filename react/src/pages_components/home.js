@@ -1,20 +1,31 @@
 import React from 'react'
 
+// Home 컴포넌트 정의 및 내보내기
+// App.js에서 component = <Home />; 가 실행될 때 이 컴포넌트가 렌더링됨
+
+// Home 컴포넌트: I2NSF에 대한 설명을 담고 있는 페이지
 export default function Home() {
+
+  // Home 컴포넌트의 내용
   return (
+    // 페이지의 좌우 여백을 200px로 설정하고, 글자 크기를 크게 설정
     <div style={{marginRight:"200px",marginLeft:"200px",fontSize:"large"}}>
         <h3>
           A Network Security Function (NSF) is a function used to ensure integrity, confidentiality, or availability of network communications, to detect unwanted network activity, or to block or at least mitigate the effects of unwanted activity. NSFs are provided and consumed in increasingly diverse environments. Users could consume network security services enforced by NSFs hosted by one or more providers, which may be their own enterprise, service providers, or a combination of both. Similarly, service providers may offer their customers network security services that are enforced by multiple security products, functions from different vendors, or open source technologies. NSFs may be provided by physical and/or virtualized infrastructure. Without standard interfaces to control and monitor the behavior of NSFs, it has become virtually impossible for providers of security services to automate service offerings that utilize different security functions from multiple vendors.
         </h3>
+        
         <h3>
           The goal of I2NSF is to define a set of software interfaces and data models for controlling and monitoring aspects of physical and virtual NSFs, enabling clients to specify rulesets. If the working group finds it necessary to work on an information model before the data models, to help provide guidance and derive the data models, it may do so. The working group will decide later whether the information model needs to be published as an RFC. Other aspects of NSFs, such as device or network provisioning and configuration, are out of scope. As there are many different security vendors or open source technologies supporting different features and functions on their devices, I2NSF will focus on flow-based NSFs that provide treatment to packets/flows, such as Intrusion Protection/Detection System (IPS/IDS), web filtering, flow filtering, deep packet inspection, or pattern matching and remediation.
         </h3>
+        
         <h3>
           Controlling and monitoring aspects of NSFs include the ability to specify rules (by a single controller at the first phase), query, and monitor NSFs by one or more management entities. The initial phase of I2NSF will only consider one single controller that can specify or change rules to NSFs because multi-headed control requires the coordination to avoid potential conflict of rules. The NSFs can be monitored by multiple entities, but the database update and synchronization among multiple management entities are out of scope for I2NSF.
         </h3>
+        
         <h3>
           I2NSF will specify interfaces at two functional levels for the control and monitoring of network security functions:
         </h3>
+        
         <ul>
           <h3>
             The I2NSF Capability Layer specifies how to control and monitor NSFs at a functional implementation level. The term "Functional Implementation" is used to emphasize that the rules (for control and monitor) of NSFs have to be implementable by most NSFs. I2NSF will standardize a set of interfaces by which a security controller can invoke, operate, and monitor NSFs.

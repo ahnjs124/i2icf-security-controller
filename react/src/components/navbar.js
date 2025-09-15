@@ -26,9 +26,10 @@ export default function Navbar() {
     }, []);
   
 
+    // return이 있는 부분이 실제로 화면에서 보이는 부분
     // JSX 문법으로 네비게이션 바 UI 정의
-    // nav 태그에 navShadow 상태를 스타일로 적용하여 스크롤에 따른 그림자 효과 구현
     return (
+        // nav 태그에 navShadow 상태를 스타일로 적용하여 스크롤에 따른 그림자 효과 구현
         <nav className="bg-white"
           style={{
             boxShadow: navShadow,
@@ -39,13 +40,13 @@ export default function Navbar() {
 
             <ul style={{fontFamily:"Audiowide"}}className="navbar-items"> {/* 네비게이션 바 항목들 */}
                 <li>
-                    <a className="navbar-items" href="/registration">Endpoint</a> {/*  네비게이션 바의 Endpoint 링크 */}
+                    <a className="navbar-items" href="/registration">Endpoint</a> {/* 네비게이션 바의 Endpoint 링크 */}
                 </li>
                 <li>
-                    <a className="navbar-items" href="/configuration">Configuration</a> {/*  네비게이션 바의 Configuration 링크 */}
+                    <a className="navbar-items" href="/configuration">Configuration</a> {/*네비게이션 바의 Configuration 링크 */}
                 </li>
                 <li>
-                    <a className="navbar-items" href="/NSFs">NSFs</a> {/*  네비게이션 바의 NSFs 링크 */}
+                    <a className="navbar-items" href="/NSFs">NSFs</a> {/* 네비게이션 바의 NSFs 링크 */}
                 </li>
             </ul>
         </nav>

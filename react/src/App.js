@@ -64,18 +64,16 @@ function App() {
       component = <Home /> // Home 컴포넌트 렌더링 및 component 변수에 할당
       break;
     case '/registration':
-      component = < Registration mode={mode}/>;
+      component = < Registration mode={mode}/>; // mode는 props로 함수로 전달
       break;
     case '/configuration':
-      component = <Configuration mode={mode}/>;
+      component = <Configuration mode={mode}/>; // mode는 props로 함수로 전달
       break;
     case '/NSFs':
-      component = <NSFs mode={mode} />;
+      component = <NSFs mode={mode} />; // mode는 props로 함수로 전달
       break;
   }
   
-
-
   // useEffect는 mode의 상태가 변경될 때마다 실행됨
   // mode 상태가 변경될 때마다 mode 상태를 로컬 스토리지에 저장하고, body 태그의 클래스명도 변경
   // localStorage.setItem(): 로컬 스토리지에 현재 mode 값을 저장

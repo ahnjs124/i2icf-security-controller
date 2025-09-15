@@ -1,36 +1,53 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import './NSFs.css'
+
+// nsfmodal 컴포넌트 불러오기
 import Nsfmodal from '../modals_components/nsfmodal';
 
+// numberWithCommas 함수: 숫자에 천 단위 구분 쉼표 추가
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+ // NSFs 컴포넌트 정의 및 내보내기
+ // App.js에서 component = <NSFs mode={mode} />; 가 실행될 때 이 컴포넌트가 렌더링됨
 export default function NSFs({mode}) {
-  
+
+  // 모달 창 열림 상태, NSF 데이터, NSF 목록 상태 관리
+  // onenModal = false: 모달 창이 닫혀 있음
+  // posts = []: NSF 목록 초기값은 빈 배열
+  // value = []: 선택된 NSF 데이터 초기값은 빈 배열
   const [openModal, setOpenModal] = useState(false);
-
   const [posts, setPosts] = useState([]);
-
   const [value, setValue] = useState([]);
 
+  // 컴포넌트가 마운트될 때(즉, <Nsfmodal />가 렌더링될 때) NSF 데이터 가져오기
+  // 초기 렌더링 시 한 번만 실행
   useEffect(() => {
+    // Flask 백엔드에서 NSF 데이터 가져오기
     fetch('http://172.24.4.120:5000/nsfDB/get')
+       // 응답을 JSON으로 파싱
        .then((response) => response.json())
+       // 가져온 데이터를 posts 상태에 저장
        .then((data) => {
           setPosts(data["nsf"]);
        })
+       // 에러 처리
        .catch((err) => {
           console.log(err.message);
        });
   }, []);
 
+  // posts 상태 확인
   console.log(posts)
 
+  // NSF 목록 테이블 렌더링
   return (
+    // NSF 목록을 담는 div, 높이는 화면 전체 높이로 설정
     <div className='NSFs' style={{height:"100vh"}}>
       <h1>Registered NSFs</h1>
+      {/* NSF 목록 테이블 */}
       <table className='nsf-table'>
         <tbody>
           <tr>
@@ -102,6 +119,7 @@ export default function NSFs({mode}) {
           })}
         </tbody>
       </table>
+      {/* 모달 창이 열려 있을 때 Nsfmodal 컴포넌트 렌더링 */}
       {openModal && <Nsfmodal closeModal={setOpenModal} mode={mode} data={value}/>} 
     </div>
     
