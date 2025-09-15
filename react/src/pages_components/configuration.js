@@ -126,9 +126,7 @@ const handleActionCheck = () => {
   setActionChecked(!actionChecked);
 };
 
-
-
-
+// Policy_infos_form 객체: 폼 데이터를 저장하는 상태 변수
 const [Policy_infos_form, setPolicyInfosform] = useState({
   "i2nsf-cfi-policy": { 
       "name": null,
@@ -234,11 +232,16 @@ const [Policy_infos_form, setPolicyInfosform] = useState({
       }
   }
 });
+
+
+// Policy_infos_form 객체: 폼 데이터를 저장하는 상태 변수
 var temp2= Policy_infos_form
 
+// XML 결과를 저장하는 상태 변수
 const [xml, setxml ] = useState("");
 
 
+// 폼 제출 시 실행되는 함수
 const ClickSubmit =async (e) => {
   e.preventDefault()
 
@@ -266,11 +269,12 @@ const ClickSubmit =async (e) => {
       }
   })
               
-  const myJson = await response.json();
-
+  const myJson = await response.json(); //extract JSON from the http response
   setxml(myJson)
 }
 
+
+// 디버깅용: 각 입력 필드의 값이 변경될 때마다 호출되는 함수
 const print =(e) => {
   console.log(e.target.name)
   console.log(e.target.value)
