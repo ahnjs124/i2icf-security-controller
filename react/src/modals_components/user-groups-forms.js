@@ -4,17 +4,19 @@ import './group-forms.css'
 
 
 function Usergroupsform({mode}) {
+    
+    const [moreIPv4, setMoreIPv4] = useState(true); // IPv4 추가 버튼 상태 변수
+    const [moreIPv6, setMoreIPv6] = useState(false); // IPv6 추가 버튼 상태 변수
 
-    // variables for the ipv dropdown buttons
-    const [moreIPv4, setMoreIPv4] = useState(true);
-    const [moreIPv6, setMoreIPv6] = useState(false);
-
-    // variables for the registration validation 
+    // User Group 등록 폼 상태 변수들 정의
     const [form, setForm] = useState({'name':null,"mac-address":null,"range-ipv4-address":{"start":null,"end":null},"range-ipv6-address":{"start":null,"end":null}});
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState({}); // 에러 상태 변수
 
 
     // variables and functions to handle the submit button and connect to MONGODB
+    
+    // IPv4 포맷에 맞도록 정규식 설정
+    // 예시: 123.123.123.123
     function validateIPv4 (value) {
         var re = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         if (re.test(value)) {
@@ -26,6 +28,8 @@ function Usergroupsform({mode}) {
         }
     }
 
+    // IPv6 포맷에 맞도록 정규식 설정
+    // 예시: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
     function validateIPv6 (value) {
         var re = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/;
         if (re.test(value)) {
@@ -37,6 +41,8 @@ function Usergroupsform({mode}) {
         }
     }
 
+    // MAC 포맷에 맞도록 정규식 설정
+    // 예시: 00:1A:2B:3C:4D:5E
     function validateMAC (value) {
         var re = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
         if (re.test(value)) {
@@ -48,6 +54,10 @@ function Usergroupsform({mode}) {
         }
     }
 
+
+    // 폼 제출 핸들러 함수 정의
+    // submit 버튼 클릭 시 호출됨
+    // 각 입력값이 포맷에 맞는지 확인하고, 맞으면 서버로 전송
     const handleSubmit = async (e) => {
         e.preventDefault()
         var mac = document.getElementById("macBox")
@@ -124,11 +134,12 @@ function Usergroupsform({mode}) {
             
             const myJson = await response.text();
             alert(myJson)
-            //console.log(myJson)
         }
     
     }
 
+
+  // return 부분에서 실제로 화면에 보이는 부분 정의
   return (
     <div style={{margin:"20px"}}>
         {/* form to submit the user-group part */}
