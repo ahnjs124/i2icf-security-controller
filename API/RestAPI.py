@@ -57,7 +57,7 @@ def restGetURLGroup():
     client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["url"]
-    
+     
     query = {query} #{"name":key}
     res = col.find_one(query)
     

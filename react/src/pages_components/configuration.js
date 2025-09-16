@@ -129,7 +129,6 @@ const handleActionCheck = () => {
 };
 
 
-
 // Policy_infos_form 객체: 폼 데이터를 저장하는 상태 변수
 const [Policy_infos_form, setPolicyInfosform] = useState({
   "i2nsf-cfi-policy": { 
@@ -271,22 +270,38 @@ const ClickSubmit =async (e) => {
   }
 
 
+  /*
+  클라이언트(React) (포트 3000)
+  - npm start -> React 개발서버 실행 -> React 앱을 브라우저에서 띄워줌.
+  - React는 클라이언트쪽으로 사용자 인터페이스(UI)를 제공하고, 사용자의 입력을 받아 Flask 서버에 요청을 보냄.
+
+  서버(Flask) (포트 5000)
+  - python3 RestAPI.py로 실행된 Flask 앱이 5000번 포트에서 요청을 기다립니다.
+  - React가 보낸 요청을 받고 api.route 데코레이터로 정의된 엔드포인트에서 요청을 처리한 뒤 React로 응답을 돌려줌.
+  */
+
+
   // 모달(팝업창) 열기
+  // await fetch(): 서버가 응답할 때까지 기다렸다가 Response 객체 받음
+  // await response.json(): 응답 본문(body)을 JSON으로 파싱할 때까지 기다렸다가 결과 받음
+
+  // fetch()는 브라우저가 제공하는 Web API로, React에 상관없이 네트워크 요청을 보냄(HTTP GET/POST/PUT/DELETE 등)
   const response = await fetch('http://172.24.4.120:5000/high_level', {
-      method: 'PUT', // HTTP 메서드를 PUT으로 지정 (데이터 수정/업데이트할 때 주로 사용)
+      method: 'PUT', // HTTP 메서드를 PUT으로 지정 (데이터 수정/업데이트 할 때 주로 사용)
       body: JSON.stringify(Policy_infos_form), // Policy_infos_form 객체를 JSON 문자열로 변환해 요청 본문(body)에 담음
       headers: {
-          'Content-Type': 'application/json'  // 서버에 보낼 데이터 형식이 JSON임을 명시 (서버가 올바르게 해석할 수 있게)
+          'Content-Type': 'application/json'  // 클라이언트에서 서버로 보낼 데이터 형식이 JSON임을 명시
       }
   })
   // => 위 코드는 Policy_infos_form 데이터를 JSON으로 변환 후,
   // http://172.24.4.120:5000/high_level 서버에 PUT 요청으로 보내고,
-  // 그 결과(응답)를 response 변수에 담는다.
+  // 응답이 왔을 때, response 변수에 응답 객체 저장
               
-
   // 응답이 JSON 형식이라고 가정하고, response 변수에서 JSON 데이터 추출
   const myJson = await response.json();
-  setxml(myJson) // 추출한 JSON 데이터를 xml 상태 변수에 저장
+  
+  // 추출한 JSON 데이터를 xml 상태 변수에 저장
+  setxml(myJson)
 }
 
 
@@ -331,6 +346,7 @@ const handleChange =(e) => {
     setPolicyInfosform(temp)
     setResolutionStrategy(e.target.value)
   }
+
   // Rule ok
   else if(e.target.name==="rulename"){
     if (e.target.value === "") {
@@ -831,6 +847,8 @@ const handleChange =(e) => {
       behavior: 'smooth'
     });
   };
+
+
   return (
     <div className='configuration'>
       <h1>Configuration</h1>
