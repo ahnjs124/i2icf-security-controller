@@ -16,19 +16,41 @@ from flask import Response
 
 from ncclient import manager
 
-
+# Read configuration file
+# Python 표준 라이브러리 configparser 모듈을 사용해서 설정 파일 파서(parser) 객체를 생성
+# 보통 .ini 형식의 설정 파일을 읽고 쓰는 데 사용
 config = configparser.ConfigParser()
+# config 객체에 현재 읽혀 있는 섹션 목록 출력 (처음에는 비어 있음)
 config.sections()
 
+# '../controller.ini' 파일을 읽어서 config 객체에 설정 정보 로드
+# 이 파일에는 섹션과 키-값 쌍으로 구성된 설정 정보가 들어 있음
 config.read('../controller.ini')
+# 만약 ini파일에 [DEFAULT] 섹션이 있으면, config.sections()시 출력이 되지 않음
 config.sections()
 
-#print(f"mongodb://127.0.0.1:27017/")
 
-
+# Flask instance 생성 (allows to run REST API)
+# Flask는 Python으로 작성된 마이크로 웹 프레임워크로, 웹 애플리케이션과 RESTful API를 쉽게 만들 수 있게 해줌
+# Flask 인스턴스는 "웹 서버 역할"을 하며, 클라이언트의 요청을 처리하고 응답을 반환
 api = Flask(__name__)
+
+
+# CORS(Cross-Origin Resource Sharing)는 웹 애플리케이션이 다른 도메인(오리진)의 리소스에 접근할 수 있도록 허용하는 메커니즘
+# 기본적으로 웹 브라우저는 보안상의 이유로 다른 도메인 간의 요청을 제한하는 동일 출처 정책(Same-Origin Policy)을 따름
+# CORS는 서버가 특정 도메인에서 오는 요청을 허용하도록 설정할 수 있게 해줌
+# Flask-CORS는 Flask 애플리케이션에서 CORS를 쉽게 설정할 수 있도록 도와주는 확장 라이브러리
+
+# 현재 react와 flask가 다른 포트를 사용하고 있으므로 CORS 설정이 필요
+# React(3000) ↔ Flask(5000)는 오리진이 달라 CORS 허용 필요 
 CORS(api)
 
+
+# @api.route 데코레이터는 Flask에서 특정 URL 경로와 HTTP 메서드에 대한 요청을 처리하는 함수를 정의할 때 사용
+# 예를 들어, @api.route('/url/get', methods = ['GET'])는 '/url/get' 경로에 대한 GET 요청이 들어오면 이를 특정 함수로 라우팅하도록 설정
+# 클라이언트가 '/url/get' 경로로 GET 요청을 보내면, Flask는 자동으로 이 데코레이터가 붙은 함수를 호출하여 요청을 처리
+
+# 즉, 데코레이터에 설정된 요청이 들어오면 아래 함수가 실행됨
 @api.route('/url/get', methods = ['GET'])
 def restGetURLGroup():
     query = request.json

@@ -12,7 +12,7 @@ export default function Configuration({mode}) {
   const [conditionChecked, setConditionChecked] = useState(false);
   const [actionChecked, setActionChecked] = useState(false);
   
-  // 모달 창 열림 상태 관리
+  // 모달(팝업창) 창 열림 상태 관리
   const [openModal, setOpenModal] = useState(false);
 
 // Policy
@@ -95,8 +95,8 @@ const [GroupName, setGroupName] = useState(); // Group 클릭시 Group Name 변�
 
 
 // variables for the users radio buttons 
-const [oneUser, setOneUser] = useState(false); //
-const [groupUser, setGroupUser] = useState(false);
+const [oneUser, setOneUser] = useState(false); // Users에서 User 선택 상태 변수
+const [groupUser, setGroupUser] = useState(false); // Users에서 Group 선택 상태 변수
 
 
 // Geograpghic Location
@@ -109,6 +109,8 @@ const [ThreadName, setThreadName] = useState(""); // Thread-Feed의 Name 변수
 // Action 체크박스 클릭 시 열리는 Action 박스 안의 변수들
 const [PrimaryAction, setPrimaryAction ] = useState(""); // Action의 Primary Action 변수
 const [SeciondaryAction, setSecondaryAction ] = useState(""); // Action의 Secondary Action 변수
+
+
 
 
 // Event 체크박스 클릭 시 상태 변경 함수
@@ -125,6 +127,8 @@ const handleConditionCheck = () => {
 const handleActionCheck = () => {
   setActionChecked(!actionChecked);
 };
+
+
 
 // Policy_infos_form 객체: 폼 데이터를 저장하는 상태 변수
 const [Policy_infos_form, setPolicyInfosform] = useState({
@@ -235,42 +239,54 @@ const [Policy_infos_form, setPolicyInfosform] = useState({
 
 
 // Policy_infos_form 객체: 폼 데이터를 저장하는 상태 변수
-var temp2= Policy_infos_form
+var temp2 = Policy_infos_form
 
 // XML 결과를 저장하는 상태 변수
 const [xml, setxml ] = useState("");
 
-
 // 폼 제출 시 실행되는 함수
 const ClickSubmit =async (e) => {
   e.preventDefault()
-
-  if(frequencyOnlyOnce ===true){
+  
+  // Condition > Context > Time > Frequency에서 선택한 값에 따라 Policy_infos_form 객체의 frequency 속성 설정
+  if(frequencyOnlyOnce === true){
+    // temp2 변수에 입력된 Policy_infos_form에서 frequency 속성 설정
     temp2['i2nsf-cfi-policy'].rules.condition.context.time.frequency = "only-once"
+    // 그리고 setPolicyInfosform으로 Policy_infos-form 상태 변수 업데이트
     setPolicyInfosform(temp2)
-  } else if( frequencyWeekly ===true){
+  } 
+  else if(frequencyWeekly ===true){
     temp2['i2nsf-cfi-policy'].rules.condition.context.time.frequency = "weekly"
     setPolicyInfosform(temp2)
 
-  } else if( frequencyMonthly ==true){
+  } 
+  else if(frequencyMonthly ==true){
     temp2['i2nsf-cfi-policy'].rules.condition.context.time.frequency = "monthly"
     setPolicyInfosform(temp2)
 
-  } else if( frequencyYearly ==true){
+  }
+  else if(frequencyYearly == true){
     temp2['i2nsf-cfi-policy'].rules.condition.context.time.frequency = "yearly"
-    setPolicyInfosform(temp2)}
+    setPolicyInfosform(temp2)
+  }
 
 
+  // 모달(팝업창) 열기
   const response = await fetch('http://172.24.4.120:5000/high_level', {
-      method: 'PUT',
-      body: JSON.stringify(Policy_infos_form),
+      method: 'PUT', // HTTP 메서드를 PUT으로 지정 (데이터 수정/업데이트할 때 주로 사용)
+      body: JSON.stringify(Policy_infos_form), // Policy_infos_form 객체를 JSON 문자열로 변환해 요청 본문(body)에 담음
       headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json'  // 서버에 보낼 데이터 형식이 JSON임을 명시 (서버가 올바르게 해석할 수 있게)
       }
   })
+  // => 위 코드는 Policy_infos_form 데이터를 JSON으로 변환 후,
+  // http://172.24.4.120:5000/high_level 서버에 PUT 요청으로 보내고,
+  // 그 결과(응답)를 response 변수에 담는다.
               
-  const myJson = await response.json(); //extract JSON from the http response
-  setxml(myJson)
+
+  // 응답이 JSON 형식이라고 가정하고, response 변수에서 JSON 데이터 추출
+  const myJson = await response.json();
+  setxml(myJson) // 추출한 JSON 데이터를 xml 상태 변수에 저장
 }
 
 
