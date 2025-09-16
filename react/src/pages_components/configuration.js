@@ -311,6 +311,8 @@ const print =(e) => {
   console.log(e.target.value)
 }
 
+
+
 const handleChange =(e) => {
   var temp = Policy_infos_form
   console.log(e.target.name)

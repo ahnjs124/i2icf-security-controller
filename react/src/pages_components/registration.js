@@ -36,22 +36,22 @@ export default function Registration(props) {
         
         {/* User Groups 버튼과 모달 창 */}
         <button className={props.mode === 'dark' ? 'dark-button' : 'light-button'} style={{marginTop:"100px"}} onClick={() => {setOpenModal(true);}}>User Groups</button>
-        {/* 버튼 클릭시 openModal이 true가 되어 Usermodal 컴포넌트 렌더링(보여줌) */}
+        {/* 버튼 클릭시 openModal이 true가 되어, usermodal.js에서 지정된 Usermodal 컴포넌트 렌더링(보여줌) */}
         {openModal && <Usermodal closeModal={setOpenModal} mode={props.mode}/>}
         
         {/* Device Groups 버튼과 모달 창 */}
         <button className={props.mode === 'dark' ? 'dark-button' : 'light-button'} onClick={() => {setOpenDeviceModal(true);}}>Device Groups</button>
-        {/* 버튼 클릭시 openDeviceModal이 true가 되어 Devicemodal 컴포넌트 렌더링(보여줌) */}
+        {/* 버튼 클릭시 openDeviceModal이 true가 되어, devicemodal.js에서 지정된 Devicemodal 컴포넌트 렌더링(보여줌) */}
         {openDeviceModal && <Devicemodal closeDeviceModal={setOpenDeviceModal} mode={props.mode}/>}
 
         {/* Location Groups 버튼과 모달 창 */}
         <button className={props.mode === 'dark' ? 'dark-button' : 'light-button'}  onClick={() => {setOpenLocationModal(true);}}>Location Groups</button>
-        {/* 버튼 클릭시 openLocationModal이 true가 되어 Locationmodal 컴포넌트 렌더링(보여줌) */}
+        {/* 버튼 클릭시 openLocationModal이 true가 되어, locationmodal.js에서 지정된 Locationmodal 컴포넌트 렌더링(보여줌) */}
         {openLocationModal && <Locationmodal closeLocationModal={setOpenLocationModal} mode={props.mode}/>}
 
         {/* URL Groups 버튼과 모달 창 */}
         <button className={props.mode === 'dark' ? 'dark-button' : 'light-button'} onClick={() => {setOpenUrlModal(true);}}>URL Groups</button>
-        {/* 버튼 클릭시 openUrlModal이 true가 되어 Urlmodal 컴포넌트 렌더링(보여줌) */}
+        {/* 버튼 클릭시 openUrlModal이 true가 되어, urlmodal.js에서 지정된 Urlmodal 컴포넌트 렌더링(보여줌) */}
         {openUrlModal && <Urlmodal closeUrlModal={setOpenUrlModal} mode={props.mode}/>}
     </div>
   )
