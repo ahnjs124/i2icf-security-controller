@@ -28,6 +28,7 @@ import pulp
 
 #ConvertedData = OrderedDict([('/i2nsf-security-policy/name', 'security_policy_for_blocking_sns'), ('/i2nsf-security-policy/rules/name', 'block_access_to_sns_during_office_hours'), ('/i2nsf-security-policy/rules/condition/ipv4/source-ipv4-range', '192.0.2.0 192.0.2.255'), ('/i2nsf-security-policy/rules/condition/ipv4/protocol', 6), ('/i2nsf-security-policy/rules/condition/url-category/user-defined', ['facebook', 'instagram']), ('/i2nsf-security-policy/rules/action/packet-action/ingress-action', 'drop')])
 
+
 def greedy(U,S):
     X = U
     
@@ -287,8 +288,16 @@ def generate(nfi,provisioning):
     return res
 
 
+# 입력 받은 xml 데이터를 각 NSF의 confd에 적용
 def gen(xml):
-    consumer = DFAAPI.dfa_construction('DataModel/cfi_dm.txt')
+    # 입력받은 xml 데이터 = 인스턴트 데이터 
+    # cfi_dm.txt는 DFAAPI 모듈이 사용하는 문법 정의 파일 (YANG 데이터 모델 정의)
+    # dfa_construction + extract_data = XML을 YANG 모델에 맞게 검증 + 매핑
+    
+    # consumer는 DFA parsing 정보를 담은 튜플: (start_state, accept_states)
+    # xml은 high-level policy를 XML 형식으로 표현한 문자열
+    # DFAAPI 모듈을 사용해서 XML 문자열을 파싱하고, high-level policy의 각 속성(attribute)과 값(value)을 추출
+    consumer = DFAAPI.dfa_construction('DataModel/cfi_dm.txt') 
     resInfo,resData = DFAAPI.extract_data(xml,consumer[0],consumer[1])
     if (not resInfo and not resData):
         return {"Error": "Grammar Error"}

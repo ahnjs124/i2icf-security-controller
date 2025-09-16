@@ -33,6 +33,7 @@ config.sections()
 # Flask instance 생성 (allows to run REST API)
 # Flask는 Python으로 작성된 마이크로 웹 프레임워크로, 웹 애플리케이션과 RESTful API를 쉽게 만들 수 있게 해줌
 # Flask 인스턴스는 "웹 서버 역할"을 하며, 클라이언트의 요청을 처리하고 응답을 반환
+# Flask 인스턴스 이름이 api이므로 @api.route로 데코레이터 설정
 api = Flask(__name__)
 
 
@@ -50,11 +51,22 @@ CORS(api)
 # 예를 들어, @api.route('/url/get', methods = ['GET'])는 '/url/get' 경로에 대한 GET 요청이 들어오면 이를 특정 함수로 라우팅하도록 설정
 # 클라이언트가 '/url/get' 경로로 GET 요청을 보내면, Flask는 자동으로 이 데코레이터가 붙은 함수를 호출하여 요청을 처리
 
-# 즉, 데코레이터에 설정된 요청이 들어오면 아래 함수가 실행됨
+# @api.route('~~', methods = ['GET'])는 뭔가를 조회하는 요청
+# @api.route('~~', methods = ['PUT'])는 뭔가를 추가하는 요청
+# @api.route('~~', methods = ['POST'])는 뭔가를 수정하는 요청
+# @api.route('~~', methods = ['DELETE'])는 뭔가를 삭제하는 요청
+
+
+# 데코레이터에 설정된 요청이 들어오면 아래 함수가 실행됨
+# Flask 인스턴스의 이름이 api이므로 @api.route로 데코레이터 설정
 @api.route('/url/get', methods = ['GET'])
 def restGetURLGroup():
+    # request는 클라이언트가 보낸 HTTP 요청을 나타내는 Flask의 전역 객체
+    # request.json은 클라이언트가 보낸 JSON 데이터를 파싱해서 Python 딕셔너리로 변환
+    # pymongo.MongoClient()는 MongoDB 데이터베이스에 연결하는 클라이언트 객체를 생성
+    # client["endpoint"]는 "endpoint"라는 이름의 데이터베이스에 접근
     query = request.json
-    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")  # 로컬 MongoDB 접속, MongoDB가 실행되고 있는지 확인 필요 (systemctl status mongod)
     db = client["endpoint"]
     col = db["url"]
      
@@ -66,6 +78,8 @@ def restGetURLGroup():
 @api.route('/url/put', methods = ['PUT'])
 def restInsertURLGroup():
     try:
+        # request는 클라이언트가 보낸 HTTP 요청을 나타내는 Flask의 전역 객체
+        # request.json은 클라이언트가 보낸 JSON 데이터를 파싱해서 Python 딕셔너리로 변환
         data = request.json
         print(data)
         client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
@@ -174,25 +188,48 @@ def restInsertCapability():
         return Response(f"Duplicate Key for {data['nsf-name']}", status=400)
 
 
-#API for security policy tranlator - Input High-level policy (CFI), Output Low-level policy (NFI)
-#http://ipv4:5000/high_level
+
+
+# API for security policy tranlator
+# Input: JSON format High-level policy (CFI) 
+# (Configuration 탭에서 Submit 버튼 누를 시 Flask 서버로 전송된 데이터) (configuration.js 에서 fetch()로 보낸 JSON 데이터)
+
+# Output: XML format Low-level policy (NFI)
+# http://ipv4:5000/high_level
 @api.route('/high_level', methods=['PUT'])
 def restInsertConfiguration():
+    # request는 클라이언트가 보낸 HTTP 요청을 나타내는 Flask의 전역 객체
+    # request.json은 요청 본문(body)에 담긴 JSON 데이터를 파싱해서 Python 딕셔너리로 변환
     req = request.json
-    #start = datetime.datetime.now()
+    print("\nReceived high-level policy:")
+    pprint(req, indent=2)
+    print("--------------------------------")
+    
+    # null 값 제거
     data = cleanNullTerms(req)
-    print(data)
-    xml = dict2xml(data)
-    result = generatorv2.gen(xml)
-    #end = datetime.datetime.now()
-    # time = end-start
-    # result["time"] = time.total_seconds()
-    # result["optimal"] = optimal.total_seconds()
-    # for x,y in result.items():
-    #     print(x)
-    #     print(y)
+    print("\nhigh-level policy after cleaning null terms:")
+    pprint(data, indent=2)
+    print("--------------------------------")
 
-    #GET IP ADDRESS OF NSF
+    # JSON to XML
+    # dict2xml 모듈을 사용해서 Python 딕셔너리를 XML 문자열로 변환
+    xml = dict2xml(data)
+    print("\nConverted XML:")
+    pprint(xml, indent=2)
+    print("--------------------------------")
+    
+    # XML to Low-level XML for each NSF
+    # generatorv2 모듈을 사용해서 XML 문자열을 각 NSF에 맞는 Low-level XML 형식으로 변환
+    result = generatorv2.gen(xml)
+    print("\nLow-level XML configurations for each NSF:")
+    
+    # result 변수는 변환된 XML 데이터를 담고 있는 딕셔너리 형태
+    # {nsf-name: xml-configuration, nsf-name2: xml-configuration2, ...} 형태
+    pprint(result, indent=2)
+    print("--------------------------------")
+   
+   
+    # GET IP ADDRESS OF NSF
     for key,value in result.items():
       try:
         client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
@@ -224,6 +261,12 @@ def restInsertConfiguration():
         print("Cannot connect to NSF's confd")
     
     return result
+
+
+
+
+
+
 
 def cleanNullTerms(d):
    clean = {}
