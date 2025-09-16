@@ -55,9 +55,8 @@ function Usergroupsform({mode}) {
     }
 
 
-    // 폼 제출 핸들러 함수 정의
-    // submit 버튼 클릭 시 호출됨
-    // 각 입력값이 포맷에 맞는지 확인하고, 맞으면 서버로 전송
+    // 폼 제출 핸들러 함수 정의 (Submit 버튼 클릭 시 호출됨)
+    // 각 입력값이 포맷에 맞는지 확인하고, 맞으면 Flask 서버로 전송
     const handleSubmit = async (e) => {
         e.preventDefault()
         var mac = document.getElementById("macBox")
@@ -66,7 +65,11 @@ function Usergroupsform({mode}) {
         var startipv6 = document.getElementById("startIPv6")
         var endipv6 = document.getElementById("endIPv6")
 
+
+        // 입력인자 확인 변수
         let checkForm = true;
+
+        // mac-address값 적었을 시, 포맷 확인
         if (form["mac-address"]!=null) {
             if (!validateMAC(form["mac-address"])) {
                 mac.style.color = "red";
@@ -80,6 +83,7 @@ function Usergroupsform({mode}) {
             }
         }
 
+        // Start-IPv4-address 포맷 확인
         if (form["range-ipv4-address"]["start"]!=null){
             if (!validateIPv4(form["range-ipv4-address"]["start"])){
                 startipv4.style.color = "red";
@@ -89,6 +93,8 @@ function Usergroupsform({mode}) {
                 startipv4.style.color = "black";
             }
         }
+
+        // End-IPv4-address 포맷 확인
         if (form["range-ipv4-address"]["end"]!=null) {
             if (!validateIPv4(form["range-ipv4-address"]["end"])){
                 endipv4.style.color = "red";
@@ -99,6 +105,7 @@ function Usergroupsform({mode}) {
             }
         }
 
+        // Start-IPv6-address 포맷 확인
         if (form["range-ipv6-address"]["start"]!=null) {
             if (!validateIPv6(form["range-ipv6-address"]["start"])) {
                 startipv6.style.color = "red";
@@ -108,6 +115,8 @@ function Usergroupsform({mode}) {
                 startipv6.style.color = "black";
             }
         }
+
+        // End-IPv6-address 포맷 확인
         if (form["range-ipv6-address"]["end"]!=null) {
             if (!validateIPv6(form["range-ipv6-address"]["end"])) {
                 endipv6.style.color = "red";
@@ -118,13 +127,21 @@ function Usergroupsform({mode}) {
             }
         }
 
+
+        // mac-address, Start-IPv4-address, Start-IPv6-address 중 하나라도 입력 안했을 시, 경고창 띄우기
         if (form["range-ipv6-address"]["start"] === null && form["range-ipv4-address"]["start"] === null && form["mac-address"] === null) {
             checkForm = false;
             alert("At least one of MAC/IPv4/IPv6 address must be filled")
         }
 
+
+
+        // 모든 입력값이 포맷에 맞다면, Flask 서버로 폼 데이터 전송
+        // form = {'name':null,"mac-address":null,"range-ipv4-address":{"start":null,"end":null},"range-ipv6-address":{"start":null,"end":null}}
         if (checkForm){
-            const response = await fetch('http://172.24.4.120:5000/user/put', {
+            // Flask 서버가 http://127.0.0.1:5000 주소에서 실행 중일 때. Flask 서버로 form 데이터 전송
+            // PUT 메서드로 /user/put 엔드포인트에 요청
+            const response = await fetch('http://127.0.0.1:5000/user/put', {
                 method: 'PUT',
                 body: JSON.stringify(form),
                 headers: {

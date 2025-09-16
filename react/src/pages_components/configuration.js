@@ -285,8 +285,10 @@ const ClickSubmit =async (e) => {
   // await fetch(): 서버가 응답할 때까지 기다렸다가 Response 객체 받음
   // await response.json(): 응답 본문(body)을 JSON으로 파싱할 때까지 기다렸다가 결과 받음
 
-  // fetch()는 브라우저가 제공하는 Web API로, React에 상관없이 네트워크 요청을 보냄(HTTP GET/POST/PUT/DELETE 등)
-  const response = await fetch('http://172.24.4.120:5000/high_level', {
+  
+  // Flask 서버가 http://127.0.0.1:5000 주소에서 실행 중일 때, Flask 서버로 Policy_infos_form 데이터 보내기 
+  // PUT 메서드로 /high_level 엔드포인트에 요청
+  const response = await fetch('http://127.0.0.1:5000/high_level', { // fetch()는 브라우저가 제공하는 Web API로, React에 상관없이 네트워크 요청을 보냄(HTTP GET/POST/PUT/DELETE 등)
       method: 'PUT', // HTTP 메서드를 PUT으로 지정 (데이터 수정/업데이트 할 때 주로 사용)
       body: JSON.stringify(Policy_infos_form), // Policy_infos_form 객체를 JSON 문자열로 변환해 요청 본문(body)에 담음
       headers: {
