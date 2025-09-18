@@ -293,22 +293,32 @@ def gen(xml):
     # 입력받은 xml 데이터 = 인스턴트 데이터 
     # cfi_dm.txt는 DFAAPI 모듈이 사용하는 문법 정의 파일 (YANG 데이터 모델 정의)
     # dfa_construction + extract_data = XML을 YANG 모델에 맞게 검증 + 매핑
-    
+
     # consumer는 DFA parsing 정보를 담은 튜플: (start_state, accept_states)
     # xml은 high-level policy를 XML 형식으로 표현한 문자열
     # DFAAPI 모듈을 사용해서 XML 문자열을 파싱하고, high-level policy의 각 속성(attribute)과 값(value)을 추출
-    consumer = DFAAPI.dfa_construction('DataModel/cfi_dm.txt') 
-    resInfo,resData = DFAAPI.extract_data(xml,consumer[0],consumer[1])
+
+    print("\nXML:")
+    pprint(xml, indent=2)
+    print("--------------------------------")
+
+   
+    consumer = DFAAPI.dfa_construction('DataModel/cfi_dm.txt') # YANG 데이터 모델 정의 기반 DFA 생성
+    
+    # resInfo: cfi_dm.txt 기반 노드 정의 리스트(토큰 테이블 기반)
+    # resData: XML에서 실제 추출된 값들의 리스트(없으면 빈 리스트)
+    # len(resInfo) == len(resData)
+    resInfo, resData = DFAAPI.extract_data(xml,consumer[0],consumer[1]) # cfi_dm.txt 기반 노드 정의 리스트 기반, XML의 값에서 cfi_dm.txt 기반 노드 정의 리스트에 해당되는 값이 있으면 빈 resData 리스트에 값 추가
     if (not resInfo and not resData):
         return {"Error": "Grammar Error"}
+    
     highData = {}
     for x in range(len(resInfo)):
-        if resData[x]:
-            #print("{id:<3}{attribute:<10}: {value}".format(id= resInfo[x][4],attribute= resInfo[x][2],value= resData[x]))
+        if resData[x]: # 해당 노드에 값이 있으면 처리, 없으면 건너뜀.
             if len(resData[x])>1:
-                highData[resInfo[x][4]] = resData[x]
+                highData[resInfo[x][4]] = resData[x] # resInfo[x][4]는 노드의 경로(path), resData[x]는 노드의 값(value)
             else:
-                highData[resInfo[x][4]] = resData[x][0]
+                highData[resInfo[x][4]] = resData[x][0] # 값이 하나만 있으면 단일 값만 저장
             
     convMongo = convertMongo(highData)
     nfi = ietf_i2nsf_nsf_facing_interface()
@@ -319,4 +329,3 @@ def gen(xml):
     if isinstance(result,str):
         return {"ERROR":"NSF not Found"}
     return result
-

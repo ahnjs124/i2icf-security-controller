@@ -232,12 +232,14 @@ def restInsertConfiguration():
     # GET IP ADDRESS OF NSF
     for key,value in result.items():
       try:
-        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
-        db = client["nsfDB"]
+        client = pymongo.MongoClient("mongodb://127.0.0.1:27017/") # 내 PC에 띄워진 MongoDB 인스턴스에 연결
+        db = client["nsfDB"] # # "nsfDB"라는 데이터베이스 선택
         col = db["capabilities"]
 
-        query = {"nsf-name":key}
+        query = {"nsf-name":key} # {"nsf-name":"firewall"}
         res = col.find_one(query)
+        print(res)
+        print("ip:", res["nsf-access-info"]["ip"])
         confd = {'address': res["nsf-access-info"]["ip"],
             'netconf_port': 2022,
             'username': 'admin',
@@ -261,10 +263,6 @@ def restInsertConfiguration():
         print("Cannot connect to NSF's confd")
     
     return result
-
-
-
-
 
 
 
