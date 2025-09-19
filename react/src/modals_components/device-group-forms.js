@@ -6,8 +6,8 @@ function Devicegroupsform({mode}) {
 
 
     // variables for the IPv4 and IPv6 dropdowns    
-    const [moreIPv4, setMoreIPv4] = useState(false);
-    const [moreIPv6, setMoreIPv6] = useState(false);
+    const [moreIPv4, setMoreIPv4] = useState(false); // 추가적인 IPv4 주소 입력 필드를 표시할지 여부
+    const [moreIPv6, setMoreIPv6] = useState(false); // 추가적인 IPv6 주소 입력 필드를 표시할지 여부
 
 
 

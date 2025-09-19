@@ -13,7 +13,7 @@ function Devicemodal({closeDeviceModal,mode}) {
               <h1>Registration</h1>
             </div>
             <div className='body'>
-                <Devicegroupsform />
+                <Devicegroupsform /> {/* device-group-forms.js의 Devicegroupsform 컴포넌트 렌더링 */}
             </div>
         </div>
     </div>

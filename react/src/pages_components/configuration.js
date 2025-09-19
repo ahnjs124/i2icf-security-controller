@@ -277,7 +277,7 @@ const ClickSubmit =async (e) => {
 
   서버(Flask) (포트 5000)
   - python3 RestAPI.py로 실행된 Flask 앱이 5000번 포트에서 요청을 기다립니다.
-  - React가 보낸 요청을 받고 api.route 데코레이터로 정의된 엔드포인트에서 요청을 처리한 뒤 React로 응답을 돌려줌.
+  - Flask 서버에서 React가 보낸 요청을 받고 api.route 데코레이터로 정의된 엔드포인트에서 해당 요청을 처리한 뒤 React로 응답을 돌려줌.
   */
 
 

@@ -51,35 +51,31 @@ CORS(api)
 # 예를 들어, @api.route('/url/get', methods = ['GET'])는 '/url/get' 경로에 대한 GET 요청이 들어오면 이를 특정 함수로 라우팅하도록 설정
 # 클라이언트가 '/url/get' 경로로 GET 요청을 보내면, Flask는 자동으로 이 데코레이터가 붙은 함수를 호출하여 요청을 처리
 
-# @api.route('~~', methods = ['GET'])는 뭔가를 조회하는 요청
-# @api.route('~~', methods = ['PUT'])는 뭔가를 추가하는 요청
-# @api.route('~~', methods = ['POST'])는 뭔가를 수정하는 요청
-# @api.route('~~', methods = ['DELETE'])는 뭔가를 삭제하는 요청
+
+# @api.route('~~', methods = ['GET'])는 현재 상태 확인
+# @api.route('~~', methods = ['PUT'])는 상태 변경
 
 
-# 데코레이터에 설정된 요청이 들어오면 아래 함수가 실행됨
-# Flask 인스턴스의 이름이 api이므로 @api.route로 데코레이터 설정
+# 데코레이터에 설정된 요청이 react에서 들어오면 아래 함수가 실행됨 (Flask 인스턴스의 이름이 api이므로 @api.route로 데코레이터 설정)
+
+
+#### URL group
 @api.route('/url/get', methods = ['GET'])
 def restGetURLGroup():
-    # request는 클라이언트가 보낸 HTTP 요청을 나타내는 Flask의 전역 객체
-    # request.json은 클라이언트가 보낸 JSON 데이터를 파싱해서 Python 딕셔너리로 변환
-    # pymongo.MongoClient()는 MongoDB 데이터베이스에 연결하는 클라이언트 객체를 생성
-    # client["endpoint"]는 "endpoint"라는 이름의 데이터베이스에 접근
+    # request는 클라이언트가 보낸 HTTP 요청을 하는 Flask 전역 객체 (request.json는 해당 객체에서 JSON 데이터를 파싱 및 딕셔너리로 변환)
     query = request.json
-    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")  # 로컬 MongoDB 접속, MongoDB가 실행되고 있는지 확인 필요 (systemctl status mongod)
-    db = client["endpoint"]
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")  # 로컬 MongoDB 접속 객체 생성, MongoDB가 실행되고 있는지 확인 필요 (systemctl status mongod)
+    db = client["endpoint"] # MongoDB의 "endpoint"라는 데이터베이스에 접근
     col = db["url"]
      
     query = {query} #{"name":key}
     res = col.find_one(query)
     
-    return json.loads(dumps(res))
+    return json.loads(dumps(res)) # HTTP에서 GET은 현재 상태 확인이므로 res를 반환
 
 @api.route('/url/put', methods = ['PUT'])
 def restInsertURLGroup():
     try:
-        # request는 클라이언트가 보낸 HTTP 요청을 나타내는 Flask의 전역 객체
-        # request.json은 클라이언트가 보낸 JSON 데이터를 파싱해서 Python 딕셔너리로 변환
         data = request.json
         print(data)
         client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
@@ -87,35 +83,13 @@ def restInsertURLGroup():
         col = db["url"]
         
         res = col.insert_one(data)
-        return "Success"
+        return "Success" # HTTP에서 PUT은 상태 변경이므로 Success 반환
     except pymongo.errors.DuplicateKeyError:
         print("Duplicate Key for ",data["name"])
 
-@api.route('/nsfDB/get', methods = ['GET'])
-def restGetAllCapability(query={}):
-    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
-    db = client["nsfDB"]
-    col = db["capabilities"]
-    result = {}
-    result["nsf"] = []
-    for res in col.find(query):
-        result["nsf"].append(res)
-    return json.loads(dumps(result))
 
-@api.route('/user/put', methods = ['PUT'])
-def restInsertUserGroup():
-    try:
-        data = request.json
-        client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
-        db = client["endpoint"]
-        col = db["user"]
-        
-        res = col.insert_one(data)
-        return "Success"
-    except pymongo.errors.DuplicateKeyError:
-        return "Duplicate Key for ",data["name"]
-        
 
+#### Device group
 @api.route('/device/get', methods = ['GET'])
 def restGetDeviceGroup():
     client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
@@ -139,12 +113,39 @@ def restInsertDeviceGroup():
         return "Duplicate Key for ",data["name"]
         
 
+
+#### User group
 @api.route('/user/get', methods = ['GET'])
 def restGetUserGroup():
     
     client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["user"]
+    query = request.json
+    res = col.find_one(query)
+    return res
+
+@api.route('/user/put', methods = ['PUT'])
+def restInsertUserGroup():
+    try:
+        data = request.json
+        client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
+        db = client["endpoint"]
+        col = db["user"]
+        
+        res = col.insert_one(data)
+        return "Success"
+    except pymongo.errors.DuplicateKeyError:
+        return "Duplicate Key for ",data["name"]
+        
+
+
+#### location group
+@api.route('/location/get', methods = ['GET'])
+def restGetLocationGroup():
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
+    db = client["endpoint"]
+    col = db["location"]
     query = request.json
     res = col.find_one(query)
     return res
@@ -162,16 +163,10 @@ def restInsertLocationGroup():
     except pymongo.errors.DuplicateKeyError:
         print("Duplicate Key for ",data["name"])
 
-@api.route('/location/get', methods = ['GET'])
-def restGetLocationGroup():
-    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
-    db = client["endpoint"]
-    col = db["location"]
-    query = request.json
-    res = col.find_one(query)
-    return res
 
 
+
+## registration interface
 # Insert Capabilities of an NSF. The DMS delivers the capabilities via Registration Interface
 @api.route('/register/nsf', methods = ['PUT'])
 def restInsertCapability():
@@ -186,6 +181,20 @@ def restInsertCapability():
     except pymongo.errors.DuplicateKeyError:
         print("Duplicate Key for ",data["nsf-name"])
         return Response(f"Duplicate Key for {data['nsf-name']}", status=400)
+
+
+# nsfDB database의 capabilities 컬렉션에서 query에 해당하는 모든 NSF의 Capability를 반환
+# Get all Capabilities of NSFs in the nsfDB database
+@api.route('/nsfDB/get', methods = ['GET'])
+def restGetAllCapability(query={}):
+    client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
+    db = client["nsfDB"]
+    col = db["capabilities"]
+    result = {}
+    result["nsf"] = []
+    for res in col.find(query):
+        result["nsf"].append(res)
+    return json.loads(dumps(result)) 
 
 
 
@@ -230,16 +239,26 @@ def restInsertConfiguration():
    
    
     # GET IP ADDRESS OF NSF
+    # key는 Firewall과 Web Filter로 2가지
     for key,value in result.items():
       try:
+        # MongoDB 클라이언트 객체를 만듬
+        # 이 객체를 통해 MongoDB 서버와 연결하고, 데이터베이스/컬렉션에 접근하거나 데이터를 주고 받을 수 있음
+        # mongodb:// → MongoDB에 접속한다는 프로토콜
+        # 127.0.0.1 → 로컬호스트 IP (즉, 현재 내 컴퓨터에서 실행 중인 MongoDB 서버)
+        # 27017 → MongoDB 서버의 기본 포트 번호
         client = pymongo.MongoClient("mongodb://127.0.0.1:27017/") # 내 PC에 띄워진 MongoDB 인스턴스에 연결
-        db = client["nsfDB"] # # "nsfDB"라는 데이터베이스 선택
-        col = db["capabilities"]
+
+
+        # Security Controller에서 high-level policy를 submit해서 DMS-server로 전달을 하면,
+        # DMS-server쪽에서 "nsfDB" 데이터베이스를 Security Controller로 전달하여,
+        # Security Controller의 mongoDB에 "nsfDB" 데이터베이스를 등록
+        db = client["nsfDB"] # "nsfDB"라는 데이터베이스 선택
+        col = db["capabilities"] # "nsfDB"안의 "capabilities"라는 컬렉션(테이블과 유사)을 선택
 
         query = {"nsf-name":key} # {"nsf-name":"firewall"}
         res = col.find_one(query)
-        print(res)
-        print("ip:", res["nsf-access-info"]["ip"])
+        print("NSF IP:", res["nsf-access-info"]["ip"])
         confd = {'address': res["nsf-access-info"]["ip"],
             'netconf_port': 2022,
             'username': 'admin',
