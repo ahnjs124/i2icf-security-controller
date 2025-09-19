@@ -4,6 +4,9 @@ Created on Thu Jun  2 15:35:20 2022
 
 @author: Patrick
 """
+# I2NSF의 CFI/NFI는 IETF RFC 8329 (I2NSF 프레임워크) 에서 역할과 위치가 정의
+# CFI: I2NSF Consumer-Facing Interface YANG Data Model
+# NFI: I2NSF NSF-Facing Interface YANG Data Model
 
 import pymongo
 from regex import R
