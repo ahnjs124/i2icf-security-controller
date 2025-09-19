@@ -207,30 +207,29 @@ def restGetAllCapability(query={}):
 # http://ipv4:5000/high_level
 @api.route('/high_level', methods=['PUT'])
 def restInsertConfiguration():
-    # request는 클라이언트가 보낸 HTTP 요청을 나타내는 Flask의 전역 객체
-    # request.json은 요청 본문(body)에 담긴 JSON 데이터를 파싱해서 Python 딕셔너리로 변환
+    # request는 클라이언트가 보낸 HTTP 요청을 하는 Flask 전역 객체 (request.json는 해당 객체에서 JSON 데이터를 파싱 및 딕셔너리로 변환)
     req = request.json
-    print("\nReceived high-level policy:")
+    print("\n● Received high-level policy (JSON):")
     pprint(req, indent=2)
     print("--------------------------------")
     
-    # null 값 제거
+    # null 값은 제거 후 남은 것들만 확인
     data = cleanNullTerms(req)
-    print("\nhigh-level policy after cleaning null terms:")
+    print("\n● High-level policy (without NULL)(JSON):")
     pprint(data, indent=2)
     print("--------------------------------")
 
     # JSON to XML
-    # dict2xml 모듈을 사용해서 Python 딕셔너리를 XML 문자열로 변환
+    # dict2xml 모듈을 사용해서 JSON을 XML 문자열로 변환
     xml = dict2xml(data)
-    print("\nConverted XML:")
+    print("\n● High-level policy (JSON to XML):")
     pprint(xml, indent=2)
     print("--------------------------------")
     
-    # XML to Low-level XML for each NSF
-    # generatorv2 모듈을 사용해서 XML 문자열을 각 NSF에 맞는 Low-level XML 형식으로 변환
+    # High-level policy XML to Low-level policy XML for each NSF
+    # generatorv2 모듈을 사용해서 High-leve policy XML 문자열을 각 NSF에 맞는 Low-level XML 형식으로 변환
     result = generatorv2.gen(xml)
-    print("\nLow-level XML configurations for each NSF:")
+    print("\n● High-level policy XML to Low-level policy XML for each NSF:")
     
     # result 변수는 변환된 XML 데이터를 담고 있는 딕셔너리 형태
     # {nsf-name: xml-configuration, nsf-name2: xml-configuration2, ...} 형태
