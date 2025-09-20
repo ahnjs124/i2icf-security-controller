@@ -239,11 +239,19 @@ def generateQuery(nfi,data):
                                                 split.replace("_","-")))
                         currentNode = currentNode[data[keyPath]]
 
+
+
 def generate(nfi,provisioning):
     res = {}
-    nfi._unset_i2nsf_security_policy()
+    # Reset the NSF-facing interface object to ensure a clean state before generating new provisioning data
+    nfi._unset_i2nsf_security_policy() # nfi 객체 안에 들어있는 기존 <i2nsf-security-policy> 내용을 비워서 빈 상태로 만듬
+    
+    # provisioning이 dict가 아니라 그냥 문자열로 들어오면, 바로 그 문자열을 반환
     if isinstance(provisioning,str):
         return provisioning
+
+    # 여러 NSF가 있을 수 있으니 각 NSF별로 반복.
+    # NSF 이름이 None이면 “해당 기능을 가진 NSF를 찾을 수 없음” 에러 반환.
     for nsf,lowData in provisioning.items():
         if nsf is None:
             return "Error, NSF with the necessarry capability not found"
@@ -328,12 +336,34 @@ def gen(xml):
     pprint(highData, indent=2)
     print("--------------------------------")
     
-    convMongo = convertMongo(highData)
-    nfi = ietf_i2nsf_nsf_facing_interface()
 
+    # convMongo는 I2NSF 웹페이지의 configuration에서 선택해서 submit된 값들을 i2nsf-security-policy 기반의 dictionary 형태로 반환
+    convMongo = convertMongo(highData)
+
+
+
+
+    # ~/i2nsf-security-controller/API/generate_bindings.sh로 bindingNFI4.py , bindingCFI.py 자동 생성
+
+    # bindingNFI4.py → NSF-Facing Interface(NFI): 실제 장비/NSF에 가까운 저수준 정책 모델
+    # 이 클래스는 YANG 모듈 ietf-i2nsf-facing-interface에서 PYANG용 PythonClass 플러그인에 의해 /i2nsf-security-policy/rules/long-connection 경로를 기반으로 자동 생성
+
+    # bindingCFI.py → Consumer/Customer-Facing Interface(CFI): 사람이 이해하기 쉬운 고수준 정책 모델
+    # 이 클래스는 YANG 모듈 ietf-i2nsf-cfi-policy에서 PYANG용 PythonClass 플러그인에 의해 /i2nsf-cfi-policy/rules/event 경로를 기반으로 자동 생성
+    nfi = ietf_i2nsf_nsf_facing_interface()
+        
     provisioning = coverSetNSF(convMongo)
-    print("Provisioning: ",provisioning)
+    print("\n● Provisioning:")
+    print(provisioning)
+    print("--------------------------------")
+    
+    
+    # CFI → NFI 변환된 low-level 데이터(provisioning)를 실제 pyangbind 객체(nfi)에 채워 넣고, 그 결과를 XML 문자열로 직렬화해서 반환하는 함수
+    # nfi: pyangbind로 생성된 NSF-facing interface(NFI) 파이썬 객체. (즉, bindingNFI4.py에서 가져온 최상위 클래스 인스턴스)
+    # provisioning: 번역된 정책 데이터. (보통 dict 형태; NSF 이름을 key로, path-value 쌍을 담은 low-level policy를 value로 가짐)
     result = generate(nfi,provisioning)
+    
+    
     if isinstance(result,str):
         return {"ERROR":"NSF not Found"}
     return result

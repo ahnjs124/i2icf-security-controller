@@ -8,7 +8,6 @@ Created on Mon May 30 16:09:31 2022
 import i2nsfMongoDB
 from collections import OrderedDict
 
-
 # 고수준 정책(CFI/그룹명·URL·프로토콜 등)을 **NFI(YANG 경로·값)**로 변환하는 핵심 번역기
 # I2NSF의 CFI/NFI는 IETF RFC 8329 (I2NSF 프레임워크) 에서 역할과 위치가 정의
 # CFI: I2NSF Consumer-Facing Interface YANG Data Model
@@ -111,7 +110,7 @@ def convertMongo(highData):
         elif (lowAttr['cfiPath']=="/i2nsf-cfi-policy/rules/condition/firewall/range-port-number/start"):
             start = value
             end = highData[17]
-            print(highData[17])
+            #print(highData[17])
             if (14 not in highData or highData[14] =="tcp"):
                 if 12 in highData:
                     lowData[lowAttr['map'][0]['nfiPath']] = str(start) + " " + str(end)
@@ -150,6 +149,7 @@ def convertMongo(highData):
         else:
             lowData[lowAttr['map'][0]['nfiPath']] = value
 
+    print("● convertMongo lowData:")
     print(lowData)
     return(lowData)
 

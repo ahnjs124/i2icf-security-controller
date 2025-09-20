@@ -248,7 +248,6 @@ def restInsertConfiguration():
         # 27017 → MongoDB 서버의 기본 포트 번호
         client = pymongo.MongoClient("mongodb://127.0.0.1:27017/") # 내 PC에 띄워진 MongoDB 인스턴스에 연결
 
-
         # Security Controller에서 high-level policy를 submit해서 DMS-server로 전달을 하면,
         # DMS-server쪽에서 "nsfDB" 데이터베이스를 Security Controller로 전달하여,
         # Security Controller의 mongoDB에 "nsfDB" 데이터베이스를 등록
