@@ -14,7 +14,8 @@ import generatorv2
 import configparser
 from flask import Response
 
-from ncclient import manager
+from ncclient import manager # NETCONF 클라이언트 라이브러리 (Python용)
+
 
 # Read configuration file
 # Python 표준 라이브러리 configparser 모듈을 사용해서 설정 파일 파서(parser) 객체를 생성
@@ -238,7 +239,7 @@ def restInsertConfiguration():
    
    
     # GET IP ADDRESS OF NSF
-    # key는 Firewall과 Web Filter로 2가지
+    # {key:value} = {firewall:"firewall 내용"} {web-filtering:"web-filtering 내용"} 으로 2가지
     for key,value in result.items():
       try:
         # MongoDB 클라이언트 객체를 만듬
@@ -248,20 +249,37 @@ def restInsertConfiguration():
         # 27017 → MongoDB 서버의 기본 포트 번호
         client = pymongo.MongoClient("mongodb://127.0.0.1:27017/") # 내 PC에 띄워진 MongoDB 인스턴스에 연결
 
-        # Security Controller에서 high-level policy를 submit해서 DMS-server로 전달을 하면,
-        # DMS-server쪽에서 "nsfDB" 데이터베이스를 Security Controller로 전달하여,
-        # Security Controller의 mongoDB에 "nsfDB" 데이터베이스를 등록
+
+        # 웹페이지에서 submit을 누르기 전에는 mongoDB의 데이터베이스를 검색해보면 print(client.list_database_names()) nsfDB 데이터베이스가 존재하지 않음.
+        # 하지만 submit을 누르면 DMS쪽에서 Security Controller쪽으로 nsfDB를 전달하여 Security Controller의 mongoDB 데이터베이스에 nsfDB가 생성됨
         db = client["nsfDB"] # "nsfDB"라는 데이터베이스 선택
         col = db["capabilities"] # "nsfDB"안의 "capabilities"라는 컬렉션(테이블과 유사)을 선택
-
+        
         query = {"nsf-name":key} # {"nsf-name":"firewall"}
         res = col.find_one(query)
         print("NSF IP:", res["nsf-access-info"]["ip"])
+
+
+
+        ### confd 입력 데이터
+        #### 아래는 최종 번역된 Low-Level Policy를 ConfD(=NSF 관리 서버)에 실제로 “적용”하는 코드
         confd = {'address': res["nsf-access-info"]["ip"],
             'netconf_port': 2022,
             'username': 'admin',
             'password': 'admin'}
 
+
+        # from ncclient import manager
+        # ncclient = Python용 NETCONF 클라이언트 라이브러리
+        # IETF NETCONF 프로토콜(SSH 기반 장비 설정 프로토콜)을 파이썬에서 쉽게 다룰 수 있도록 해줌
+       
+        # manager = ncclient에서 NETCONF 서버 연결 및 조작을 쉽게 해주는 모듈
+        # manager.connect() = 가장 자주 쓰이는 함수, NETCONF 세션 열 때 사용
+        
+        # connect → NETCONF 서버(예: ConfD, 라우터, 스위치)에 연결
+        # get-config, edit-config → 설정 조회/변경
+        # rpc → 사용자 정의 RPC 호출
+        # close-session → 세션 종료
         confd_manager = manager.connect(
             host = confd["address"],
             port = confd["netconf_port"],
@@ -269,12 +287,22 @@ def restInsertConfiguration():
             password = confd["password"],
             hostkey_verify = False)
         
+
+        # NETCONF에서 설정을 변경할 때는 <edit-config> RPC 안에 <config> 요소를 포함해야 함.
+        # 여기서 {value} 부분에는 실제 적용하려는 Low-Level Policy XML이 들어가야 함.
         configuration = f"""
     <nc:config xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
         {value}
     </nc:config>
     """
+
+        # 설정 반영하기
+        # edit_config() : NETCONF 표준 RPC 호출
+        # target="running" : ConfD의 “running datastore”에 설정 적용
+        # config=configuration : 위에서 만든 XML을 넘겨줌
         confd_configuration = confd_manager.edit_config(target="running",config = configuration)
+        
+        # NETCONF 세션 종료
         confd_manager.close_session()
       except:
         print("Cannot connect to NSF's confd")

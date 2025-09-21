@@ -341,8 +341,6 @@ def gen(xml):
     convMongo = convertMongo(highData)
 
 
-
-
     # ~/i2nsf-security-controller/API/generate_bindings.sh로 bindingNFI4.py , bindingCFI.py 자동 생성
 
     # bindingNFI4.py → NSF-Facing Interface(NFI): 실제 장비/NSF에 가까운 저수준 정책 모델
