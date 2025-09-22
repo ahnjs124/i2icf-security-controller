@@ -90,6 +90,8 @@ def findMap(key,cap):
         if key in x:
             return(x[key])
 
+
+
 def coverSetNSF(convertedData):
     #start = datetime.now()
     Universe = []
@@ -308,26 +310,28 @@ def gen(xml):
     
     consumer = DFAAPI.dfa_construction('DataModel/cfi_dm.txt') # YANG 데이터 모델 정의 기반 DFA 생성
     resInfo, resData = DFAAPI.extract_data(xml,consumer[0],consumer[1]) # cfi_dm.txt 기반 노드 정의 리스트 기반, XML의 값에서 cfi_dm.txt 기반 노드 정의 리스트에 해당되는 값이 있으면 빈 resData 리스트에 값 추가
-  
+
+    # resInfo: cfi_dm.txt 기반 노드 정의 리스트(토큰 테이블 기반)  
     print("\n● resInfo:")
     pprint(resInfo, indent=2)
     print("--------------------------------")
-
+    
+    # resData: XML에서 실제 추출된 값들의 리스트(빈 리스트)
+    # len(resInfo) == len(resData)
     print("\n● resData:")
     pprint(resData, indent=2)
     print("--------------------------------")
 
     if (not resInfo and not resData):
         return {"Error": "Grammar Error"}
+      
     
-       
-    # resInfo: cfi_dm.txt 기반 노드 정의 리스트(토큰 테이블 기반)
-    # resData: XML에서 실제 추출된 값들의 리스트(빈 리스트)
-    # len(resInfo) == len(resData)
+    # 
     highData = {}
     for x in range(len(resInfo)):
-        if resData[x]: # resData 노드의 해당 index에 값이 있으면 처리, 없으면 건너뜀.
+        if resData[x]: # resData 노드에 값이 있으면 처리, 없으면 건너뜀.
             if len(resData[x])>1:
+                # [False, 1, 'name', True, 1] 처럼 마지막에 있는 ID를 highData의 key값으로 받음
                 highData[resInfo[x][4]] = resData[x] # resInfo[x][4]는 노드의 경로(path), resData[x]는 노드의 값(value)
             else:
                 highData[resInfo[x][4]] = resData[x][0] # 값이 하나만 있으면 단일 값만 저장
@@ -340,16 +344,20 @@ def gen(xml):
     # convMongo는 I2NSF 웹페이지의 configuration에서 선택해서 submit된 값들을 i2nsf-security-policy 기반의 dictionary 형태로 반환
     convMongo = convertMongo(highData)
 
-
     # ~/i2nsf-security-controller/API/generate_bindings.sh로 bindingNFI4.py , bindingCFI.py 자동 생성
-
     # bindingNFI4.py → NSF-Facing Interface(NFI): 실제 장비/NSF에 가까운 저수준 정책 모델
     # 이 클래스는 YANG 모듈 ietf-i2nsf-facing-interface에서 PYANG용 PythonClass 플러그인에 의해 /i2nsf-security-policy/rules/long-connection 경로를 기반으로 자동 생성
 
     # bindingCFI.py → Consumer/Customer-Facing Interface(CFI): 사람이 이해하기 쉬운 고수준 정책 모델
     # 이 클래스는 YANG 모듈 ietf-i2nsf-cfi-policy에서 PYANG용 PythonClass 플러그인에 의해 /i2nsf-cfi-policy/rules/event 경로를 기반으로 자동 생성
+
+    # ietf_i2nsf_nsf_facing_interface()는 bindingNFI4.py안에 있는 함수 (자동 생성 함수)
     nfi = ietf_i2nsf_nsf_facing_interface()
-        
+
+    print("\n● nfi:")
+    print(nfi)
+    print("--------------------------------")
+
     provisioning = coverSetNSF(convMongo)
     print("\n● Provisioning:")
     print(provisioning)
@@ -360,7 +368,9 @@ def gen(xml):
     # nfi: pyangbind로 생성된 NSF-facing interface(NFI) 파이썬 객체. (즉, bindingNFI4.py에서 가져온 최상위 클래스 인스턴스)
     # provisioning: 번역된 정책 데이터. (보통 dict 형태; NSF 이름을 key로, path-value 쌍을 담은 low-level policy를 value로 가짐)
     result = generate(nfi,provisioning)
-    
+    print("\n● result:")
+    print(result)
+    print("--------------------------------")
     
     if isinstance(result,str):
         return {"ERROR":"NSF not Found"}

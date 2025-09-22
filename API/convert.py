@@ -13,12 +13,54 @@ from collections import OrderedDict
 # CFI: I2NSF Consumer-Facing Interface YANG Data Model
 # NFI: I2NSF NSF-Facing Interface YANG Data Model
 
+# highData 예시
+# {1: 'policy111', 2: 'rule111', 13: 'webserver', 14: 'tcp', 16: 80, 17: 80, 71: 'drop'}
+'''
+● highData:
+{ 1: 'policy111',
+  5: 'rule111',
+  13: 'webserver',
+  14: 'tcp',
+  16: 80,
+  17: 80,
+  71: 'drop'}
+
+keys,values: 1 policy111
+i2nsfMongoDB.getAttributesMap(1)
+=> lowAttr: {'_id': ObjectId('68cfb411f645946c6a56eb0f'), 'cfiPath': '/i2nsf-cfi-policy/name', 'cfiID': 1, 'map': [{'nfiId': 1, 'nfiPath': '/i2nsf-security-policy/name'}]}
+
+keys,values: 5 rule111
+i2nsfMongoDB.getAttributesMap(5)
+=> lowAttr: {'_id': ObjectId('68cfb411f645946c6a56eb12'), 'cfiPath': '/i2nsf-cfi-policy/rules/name', 'cfiID': 5, 'map': [{'nfiId': 7, 'nfiPath': '/i2nsf-security-policy/rules/name'}]}
+
+keys,values: 13 webserver
+i2nsfMongoDB.getAttributesMap(13)
+=> lowAttr: {'_id': ObjectId('68cfb411f645946c6a56eb17'), 'cfiPath': '/i2nsf-cfi-policy/rules/condition/firewall/destination', 'cfiID': 13, 'map': [{'nfiId': 20, 'nfiPath': '/i2nsf-security-policy/rules/condition/layer-2/destination-mac-address'}, {'nfiId': 39, 'nfiPath': '/i2nsf-security-policy/rules/condition/ipv4/destination-ipv4-network'}, {'nfiId': 41, 'nfiPath': '/i2nsf-security-policy/rules/condition/ipv4/destination-ipv4-range'}, {'nfiId': 60, 'nfiPath': '/i2nsf-security-policy/rules/condition/ipv6/destination-ipv6-network'}, {'nfiId': 62, 'nfiPath': '/i2nsf-security-policy/rules/condition/ipv6/destination-ipv6-range'}, {'nfiId': 80, 'nfiPath': '/i2nsf-security-policy/rules/condition/tcp/destination-port-number'}, {'nfiId': 98, 'nfiPath': '/i2nsf-security-policy/rules/condition/udp/destination-port-number'}, {'nfiId': 109, 'nfiPath': '/i2nsf-security-policy/rules/condition/sctp/destination-port-number'}, {'nfiId': 121, 'nfiPath': '/i2nsf-security-policy/rules/condition/dccp/destination-port-number'}, {'nfiId': 139, 'nfiPath': '/i2nsf-security-policy/rules/condition/voice/destination-voice-id'}]}
+
+keys,values: 14 tcp
+i2nsfMongoDB.getAttributesMap(14)
+=> lowAttr: {'_id': ObjectId('68cfb411f645946c6a56eb18'), 'cfiPath': '/i2nsf-cfi-policy/rules/condition/firewall/transport-layer-protocol', 'cfiID': 14, 'map': [{'nfiId': 32, 'nfiPath': '/i2nsf-security-policy/rules/condition/ipv4/protocol'}, {'nfiId': 57, 'nfiPath': '/i2nsf-security-policy/rules/condition/ipv6/protocol'}]}
+
+keys,values: 16 80
+i2nsfMongoDB.getAttributesMap(16)
+=> lowAttr: {'_id': ObjectId('68cfb411f645946c6a56eb19'), 'cfiPath': '/i2nsf-cfi-policy/rules/condition/firewall/range-port-number/start', 'cfiID': 16, 'map': [{'nfiId': 77, 'nfiPath': '/i2nsf-security-policy/rules/condition/tcp/source-port-number/port-numbers'}, {'nfiId': 81, 'nfiPath': '/i2nsf-security-policy/rules/condition/tcp/destination-port-number/port-numbers'}, {'nfiId': 95, 'nfiPath': '/i2nsf-security-policy/rules/condition/udp/source-port-number/port-numbers'}, {'nfiId': 99, 'nfiPath': '/i2nsf-security-policy/rules/condition/udp/destination-port-number/port-numbers'}, {'nfiId': 106, 'nfiPath': '/i2nsf-security-policy/rules/condition/sctp/source-port-number/port-numbers'}, {'nfiId': 110, 'nfiPath': '/i2nsf-security-policy/rules/condition/sctp/destination-port-number/port-numbers'}, {'nfiId': 118, 'nfiPath': '/i2nsf-security-policy/rules/condition/dccp/source-port-number/port-numbers'}, {'nfiId': 122, 'nfiPath': '/i2nsf-security-policy/rules/condition/dccp/destination-port-number/port-numbers'}]}
+
+keys,values: 17 80
+i2nsfMongoDB.getAttributesMap(17)
+=> lowAttr: {'_id': ObjectId('68cfb411f645946c6a56eb1a'), 'cfiPath': '/i2nsf-cfi-policy/rules/condition/firewall/range-port-number/end', 'cfiID': 17, 'map': [{'nfiId': 77, 'nfiPath': '/i2nsf-security-policy/rules/condition/tcp/source-port-number/port-numbers'}, {'nfiId': 81, 'nfiPath': '/i2nsf-security-policy/rules/condition/tcp/destination-port-number/port-numbers'}, {'nfiId': 95, 'nfiPath': '/i2nsf-security-policy/rules/condition/udp/source-port-number/port-numbers'}, {'nfiId': 99, 'nfiPath': '/i2nsf-security-policy/rules/condition/udp/destination-port-number/port-numbers'}, {'nfiId': 106, 'nfiPath': '/i2nsf-security-policy/rules/condition/sctp/source-port-number/port-numbers'}, {'nfiId': 110, 'nfiPath': '/i2nsf-security-policy/rules/condition/sctp/destination-port-number/port-numbers'}, {'nfiId': 118, 'nfiPath': '/i2nsf-security-policy/rules/condition/dccp/source-port-number/port-numbers'}, {'nfiId': 122, 'nfiPath': '/i2nsf-security-policy/rules/condition/dccp/destination-port-number/port-numbers'}]}
+
+keys,values: 71 drop
+i2nsfMongoDB.getAttributesMap(71)
+=> lowAttr: {'_id': ObjectId('68cfb411f645946c6a56eb3b'), 'cfiPath': '/i2nsf-cfi-policy/rules/action/primary-action/action', 'cfiID': 71, 'map': [{'nfiId': 177, 'nfiPath': '/i2nsf-security-policy/rules/action/packet-action/ingress-action'}, {'nfiId': 178, 'nfiPath': '/i2nsf-security-policy/rules/action/packet-action/egress-action'}, {'nfiId': 179, 'nfiPath': '/i2nsf-security-policy/rules/action/packet-action/log-action'}, {'nfiId': 181, 'nfiPath': '/i2nsf-security-policy/rules/action/flow-action/ingress-action'}, {'nfiId': 182, 'nfiPath': '/i2nsf-security-policy/rules/action/flow-action/egress-action'}, {'nfiId': 183, 'nfiPath': '/i2nsf-security-policy/rules/action/flow-action/log-action'}]}
+'''
+
+
+# highData는 사용자로부터 전달된 null값이 제외된 데이터 (CFI)
+# 해당 CFI 데이터를 기반으로 방화벽 정책을 생성하는 NFI를 적용시켜야 한다
+# 그걸 위해서는 mapping을 해야하는데, convertMongo에서 해당 mapping을 진행한다
 def convertMongo(highData):
     lowData = OrderedDict()
 
-
-    # highData 예시
-    # {1: 'newPolicy', 2: 'newRule', 13: 'webserver', 14: 'tcp', 16: 80, 17: 80, 71: 'drop'}
     for keys,value in highData.items():
         lowAttr = i2nsfMongoDB.getAttributesMap(keys)
         ip=None
@@ -149,8 +191,10 @@ def convertMongo(highData):
         else:
             lowData[lowAttr['map'][0]['nfiPath']] = value
 
-    print("● convertMongo lowData:")
+    print("\n● convertMongo lowData:")
     print(lowData)
+    print("--------------------------------")
+
     return(lowData)
 
 # mydict = {"ipv4-capability": "source-address"}

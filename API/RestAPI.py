@@ -229,11 +229,10 @@ def restInsertConfiguration():
     
     # High-level policy XML to Low-level policy XML for each NSF
     # generatorv2 모듈을 사용해서 High-leve policy XML 문자열을 각 NSF에 맞는 Low-level XML 형식으로 변환
-    result = generatorv2.gen(xml)
-    print("\n● High-level policy XML to Low-level policy XML for each NSF:")
-    
     # result 변수는 변환된 XML 데이터를 담고 있는 딕셔너리 형태
     # {nsf-name: xml-configuration, nsf-name2: xml-configuration2, ...} 형태
+    result = generatorv2.gen(xml)
+    print("\n● High-level policy XML to Low-level policy XML for each NSF:")   
     pprint(result, indent=2)
     print("--------------------------------")
    
@@ -250,15 +249,14 @@ def restInsertConfiguration():
         client = pymongo.MongoClient("mongodb://127.0.0.1:27017/") # 내 PC에 띄워진 MongoDB 인스턴스에 연결
 
 
-        # 웹페이지에서 submit을 누르기 전에는 mongoDB의 데이터베이스를 검색해보면 print(client.list_database_names()) nsfDB 데이터베이스가 존재하지 않음.
+        # 웹페이지에서 submit을 누르기 전에는 mongoDB의 데이터베이스를 검색해보면 print(client.list_database_names()) nsfDB 데이터베이스가 존재하지 않음
         # 하지만 submit을 누르면 DMS쪽에서 Security Controller쪽으로 nsfDB를 전달하여 Security Controller의 mongoDB 데이터베이스에 nsfDB가 생성됨
-        db = client["nsfDB"] # "nsfDB"라는 데이터베이스 선택
-        col = db["capabilities"] # "nsfDB"안의 "capabilities"라는 컬렉션(테이블과 유사)을 선택
+        db = client["nsfDB"] # "nsfDB" 데이터베이스
+        col = db["capabilities"] # "nsfDB"안의 "capabilities" 컬렉션(테이블과 유사) 선택
         
         query = {"nsf-name":key} # {"nsf-name":"firewall"}
         res = col.find_one(query)
         print("NSF IP:", res["nsf-access-info"]["ip"])
-
 
 
         ### confd 입력 데이터
@@ -320,7 +318,7 @@ def cleanNullTerms(d):
             clean[k] = nested
       elif v is not None:
          clean[k] = v
-   return clean
+   return clean 
 
 def main(argv):
 #  print(sys.argv[1])

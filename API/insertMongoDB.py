@@ -11,6 +11,8 @@ from pprint import pprint
 # i2nsfMongoDB.insertUserGroup({'name':"employees","mac-address":None,"range-ipv4-address":{"start":"192.0.2.0","end":"192.0.2.255"},"range-ipv6-address":{"start":None,"end":None}})
 # i2nsfMongoDB.insertUserGroup({'name':"employeesv6","mac-address":None,"range-ipv4-address":{"start":None,"end":None},"range-ipv6-address":{"start":"2001:db8:1::","end":"2001:db8:1:f:ffff:ffff:ffff:ffff"}})
 
+# Capability Mapping 삽입
+# mongo의 데이터베이스에 mapping을 생성시키고, capabilityMapping 내용을 넣음
 # INSERT CAPABILITY MAPPING FROM AUTOMATIC DATA MODEL MAPPER
 with open("capabilityMapping.json") as f:
     capDict = json.load(f)
@@ -18,6 +20,7 @@ with open("capabilityMapping.json") as f:
     i2nsfMongoDB.insertCapabilityMapping(capDict["capabilityMapping"])
 
 # INSERT CAPABILITY PATH
+# mongo의 mapping 데이터베이스에 capabilityPath 내용을 넣음
 with open("capabilityPath.json") as f:
     capDict = json.load(f)
     #print(capDict["capabilityPath"])
@@ -25,7 +28,10 @@ with open("capabilityPath.json") as f:
 
 # print(i2nsfMongoDB.getCapabilityPath("ipv4-capability"))
 
+
 # Attribute Mapping
+# 이 부분을 실행시키면 mongo의 데이터베이스에 endpoint가 생성됨
+# ★ MongoDB에서 consumer facing interface(CFI) ID와 NSF-facing-interface(NFI) ID를 서로 Mapping시킴
 i2nsfMongoDB.insertAttributesMap('DataModel/cfi_minus.txt','DataModel/nfi.txt')
 
 #INSERT CAPABILITY
@@ -44,11 +50,13 @@ i2nsfMongoDB.insertAttributesMap('DataModel/cfi_minus.txt','DataModel/nfi.txt')
 #     i2nsfMongoDB.insertCapability(data)
 
 # INSERT ICMP MESSAGE MAPPING
+# mongo의 mapping 데이터베이스에 icmp-code-type 내용을 넣음
 with open("icmp-code-type.json") as f:
     icmpDict = json.load(f)
     i2nsfMongoDB.insertICMPMessage(icmpDict["icmp-code-type"])
 
 # INSERT NEXT HEADER (PROTOCOL) MAPPING
+# mongo의 mapping 데이터베이스에 next-header 내용을 넣음
 with open("next-header.json") as f:
     nhDict = json.load(f)
     i2nsfMongoDB.insertNextHeader(nhDict["next-header"])
