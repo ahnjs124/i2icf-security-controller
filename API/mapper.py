@@ -311,7 +311,6 @@ def mapAttributes(cfiTree,nfiTree):
     #########################################################################
 
 
-
     # READ NFI / High-Level YANG Data Model tree and parse it into python yang dm class
     with open(nfiTree,'r') as f:
         next(f)
@@ -345,6 +344,8 @@ def mapAttributes(cfiTree,nfiTree):
 
 
 
+    # NFI 트리에서 리프(leaf) 노드와 비-리프(non-leaf) 노드를 분리해서 따로 보관하고,
+    # 리프(leaf)들엔 연속 번호(nfiLeafID) 를 붙이는 단계
     nfiLeaf = [] #For only the leaf data model
     nfiLeafID = 0
     for x in nfiFull:
