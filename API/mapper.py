@@ -265,6 +265,12 @@ def mapAttributes(cfiTree,nfiTree):
     
 
     ##### 부모 아래의 직속 자식들을 확인한다.
+    # 예시: 
+    '''
+    parent: context (id=36, path=/i2nsf-cfi-policy/rules/condition/context)
+      children: [('time', 37, '/i2nsf-cfi-policy/rules/condition/context/time'), ('application', 47, '/i2nsf-cfi-policy/rules/condition/context/application'), ('device-type', 49, '/i2nsf-cfi-policy/rules/condition/context/device-type'), ('users', 51, '/i2nsf-cfi-policy/rules/condition/context/users'), ('geographic-location', 58, '/i2nsf-cfi-policy/rules/condition/context/geographic-location')]
+    '''
+
     for i in range(len(cfiFull)):
         for j in range(len(cfiFull)):
             try:
@@ -281,8 +287,14 @@ def mapAttributes(cfiTree,nfiTree):
             print("  children:", kids)
             print()
 
+    
+    # YANG에서 leaf는 자식이 없고 값을 한 개만 가지는 노드    
+    # ?가 있으면 해당 값이 있을수도 있고, 없을수도 있다.
+    # leaf 예시: +--rw identification? uint16
+    # leaf 예시: +--rw name string
 
-
+    # CFI 트리에서 리프(leaf) 노드와 비-리프(non-leaf) 노드를 분리해서 따로 보관하고,
+    # 리프(leaf)들엔 연속 번호(leafID) 를 붙이는 단계
     cfiLeaf = [] #For only the leaf data model
     leafID=0
     for x in cfiFull:
@@ -296,6 +308,7 @@ def mapAttributes(cfiTree,nfiTree):
         if not x.isLeaf and not x.skip:
             cfiNonLeaf.append(x)
             
+    #########################################################################
 
 
 
