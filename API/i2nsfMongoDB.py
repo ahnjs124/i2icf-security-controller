@@ -103,6 +103,7 @@ def getLocationGroup(country,region,city):
     res = col.find_one(query)
     return res
 
+
 # Register Attributes Mapping
 def insertAttributesMap(cfiTree,nfiTree):
     try:
@@ -111,6 +112,8 @@ def insertAttributesMap(cfiTree,nfiTree):
         db = client["endpoint"]
         col = db["mapping"]
 
+        # mapResult로 가장 가까운 yangdm 객체들을 판별해냄
+        # 해당 값들을 기준으로 mapping 구성하여, mongoDB의 endpoint 데이터베이스의 mapping에 입력
         for key,values in mapResult.items():
             mapDict = {}
             mapDict["cfiPath"]=key.path()
@@ -123,6 +126,8 @@ def insertAttributesMap(cfiTree,nfiTree):
         return res 
     except pymongo.errors.DuplicateKeyError:
         print("Duplicate Key for ",mapDict["cfiID"])
+
+
 
 def getAttributesMap(cfiID):
     client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
