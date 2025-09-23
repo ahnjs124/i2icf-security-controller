@@ -41,7 +41,7 @@ module: ietf-i2nsf-cons-facing-interface
   |     |  |  |  +--rw end-date-time?     yang:date-and-time
   |     |  |  |  +--rw period
   |     |  |  |  |  +--rw start-time?   time
-  |     |  |  |  |  +--rw end-time?     time
+  |     |  |  |  |  +--rw end-time?     time 
   |     |  |  |  |  +--rw day*          day
   |     |  |  |  |  +--rw date*         int8
   |     |  |  |  |  +--rw month*        string

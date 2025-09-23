@@ -120,29 +120,42 @@ def parsing(line,id):
     return data
 
 
-
-
-
 def text_to_vector(text):
+    # 예시:
+    # text: i2nsf-security-policy
+    # words: ['i2nsf', 'security', 'policy']
+    # text: i2nsf-cfi-policy
+    # words: ['i2nsf', 'cfi', 'policy']
+
     WORD = re.compile(r"\w+")
     words = WORD.findall(text)
-    return Counter(words)
+    return Counter(words) # 리스트 내용을 counting해서 dictionary화 시킴
+
 
 def get_cosine(vector1, vector2):
-    vec1 = text_to_vector(vector1)
-    vec2 = text_to_vector(vector2)
-    intersection = set(vec1.keys()) & set(vec2.keys())
-    numerator = sum([vec1[x] * vec2[x] for x in intersection])
+    vec1 = text_to_vector(vector1) # Counter(['i2nsf', 'security', 'policy']) = vec1 = {'i2nsf': 1, 'security': 1, 'policy': 1}
+    vec2 = text_to_vector(vector2) # Counter(['i2nsf', 'cfi', 'policy']) = vec2 = {'i2nsf': 1, 'cfi': 1, 'policy': 1}
+    intersection = set(vec1.keys()) & set(vec2.keys()) # 공통 부분만 추출 => intersection = {'i2nsf','policy'}
+    # 분자
+    numerator = sum([vec1[x] * vec2[x] for x in intersection]) # 각 key의 value값 곱하기 (출연횟수의 곱)
 
-    sum1 = sum([vec1[x] ** 2 for x in list(vec1.keys())])
-    sum2 = sum([vec2[x] ** 2 for x in list(vec2.keys())])
-
+    sum1 = sum([vec1[x] ** 2 for x in list(vec1.keys())]) # 각 벡터의 제곱합 vec1 = {'i2nsf':1, 'security':1, 'policy':1} => 1² + 1² + 1² = 3
+    sum2 = sum([vec2[x] ** 2 for x in list(vec2.keys())]) # 각 벡터의 제곱합 vec2 = {'i2nsf':1, 'cfi':1, 'policy':1} => 1² + 1² + 1² = 3
+    # 분모
     denominator = math.sqrt(sum1) * math.sqrt(sum2)
+
+
+    # 기존 코사인 유사도: cos(θ) = numerator / denominator => 두 벡터가 얼마나 유사한지 0~1 사이의 값으로 나옴
+    # 여기서는 유사도가 아니라 "거리"처럼 변환해서 쓰기 위해서, 1 - (numerator/denominator)를 사용
+    # 값이 작을수록 비슷하고, 클수록 다름
     if not denominator:
-        return 1 * int(max(len(vector1),len(vector2)))
+        # denominator가 0일 때
+        return 1 * int(max(len(vector1),len(vector2))) # len(vector1)를 곱해서, 문자열 길이만큼 스케일링된 거리값을 나타냄, 두 문자열이 길수록 차이가 커짐
     else:
-        return int(len(vector1) * (1- float(numerator) / denominator))
+        # denominator가 0이 아닌 수(양수, 음수, float 전부)
+        return int(len(vector1) * (1- float(numerator) / denominator)) # len(vector1)를 곱해서, 문자열 길이만큼 스케일링된 거리값을 나타냄, 두 문자열이 길수록 차이가 커짐
     
+
 def weird_dist(A, B):
     """
        Available to use for calculating Distance:
@@ -151,6 +164,7 @@ def weird_dist(A, B):
        3. get_cosine(A,B)
     """
     return get_cosine(A, B) 
+
 
 class WeirdNode(object):
 
@@ -167,8 +181,11 @@ class WeirdNode(object):
         return node.my_label
 
     def addkid(self, node, before=False):
-        if before:  self.my_children.insert(0, node)
-        else:   self.my_children.append(node)
+        if before:  
+            self.my_children.insert(0, node)
+        else:
+            self.my_children.append(node)
+        
         return self
     
     
@@ -215,7 +232,7 @@ def mapAttributes(cfiTree,nfiTree):
         # cfi_minus.txt파일을 가장 아래줄부터 위로 훝는다.
         # 기준행인 i행을 잡고, 그보다 위쪽에 있는 행등을 살피면서, 한칸 안쪽으로 들어간 행이 바로 부모로 설정한다.
         # 즉, 기준 i행과 level을 비교해서 낮은 레벨의 행이 나오면 바로 부모로 설정한다.
-        print("YangDataModel line:")
+        print("cfi YangDataModel line:")
         print(cfiFull[i].printDM())
 
         for j in range(i-1,-1,-1):
@@ -225,7 +242,7 @@ def mapAttributes(cfiTree,nfiTree):
                 cfiFull[i].setParent(cfiFull[j])
                 break
         
-        print("line parent:")
+        print("cfi line parent:")
         if i != 0:
             print(cfiFull[i].parent.tag) # 부모행 tag
         else: 
@@ -289,7 +306,7 @@ def mapAttributes(cfiTree,nfiTree):
 
     
     # YANG에서 leaf는 자식이 없고 값을 한 개만 가지는 노드    
-    # ?가 있으면 해당 값이 있을수도 있고, 없을수도 있다.
+    # ?가 있으면 해당 값이 있을수도 있고, 없을수도 있다. (설정만 해놓음)
     # leaf 예시: +--rw identification? uint16
     # leaf 예시: +--rw name string
 
@@ -307,11 +324,15 @@ def mapAttributes(cfiTree,nfiTree):
     for x in cfiFull:
         if not x.isLeaf and not x.skip:
             cfiNonLeaf.append(x)
-            
+    
+    print("single cfiLeaf:\n", cfiLeaf)
+    print("single cfiNonLeaf:\n", cfiNonLeaf)
+
     #########################################################################
 
 
     # READ NFI / High-Level YANG Data Model tree and parse it into python yang dm class
+    ##### CFI와 같이 각 행별로 Yang Data Model 형태 parsing
     with open(nfiTree,'r') as f:
         next(f)
         id = 0
@@ -320,19 +341,35 @@ def mapAttributes(cfiTree,nfiTree):
             nfiFull.append(parsing(line,id))
             id += 1
             
+
+    ##### CFI와 같이 nfiFull에 들어있는 모든 yang data model 데이터들의 부모값을 입력
     for i in range(len(nfiFull)-1,-1,-1):
+        print("nfi YangDataModel line:")
+        print(nfiFull[i].printDM())
+
         for j in range(i-1,-1,-1):
             if nfiFull[i].level > nfiFull[j].level:
                 nfiFull[i].setParent(nfiFull[j])
                 break
-    
+        
+        print("nfi line parent:")
+        if i != 0:
+            print(nfiFull[i].parent.tag) # 부모행 tag
+        else: 
+            print(nfiFull[i].parent)
+        print("--------------")
+
+
+    ##### CFI와 같이 건너뛸 부분(skip) 판단하기
     for i in range(len(nfiFull)-1,-1,-1):
         try:
             while nfiFull[i].parent.skip:
                 nfiFull[i].setParent(nfiFull[i].parent.parent)
         except:
             pass
-    
+
+
+    ##### CFI와 같이 부모 아래의 직속 자식들을 확인
     for i in range(len(nfiFull)):
         for j in range(len(nfiFull)):
             try:
@@ -341,7 +378,12 @@ def mapAttributes(cfiTree,nfiTree):
             except:
                 pass
                     
-
+        # i행 부모의 직속 자식만 즉시 확인
+        if nfiFull[i].child:
+            print(f"parent: {nfiFull[i].tag} (id={nfiFull[i].id}, path={nfiFull[i].path()})")
+            kids = [(ch.tag, ch.id, ch.path()) for ch in nfiFull[i].child]
+            print("  children:", kids)
+            print()
 
 
     # NFI 트리에서 리프(leaf) 노드와 비-리프(non-leaf) 노드를 분리해서 따로 보관하고,
@@ -359,23 +401,37 @@ def mapAttributes(cfiTree,nfiTree):
         if not x.isLeaf and not x.skip:
             nfiNonLeaf.append(x)
 
+    print("single nfiLeaf:\n", nfiLeaf)
+    print("single nfiNonLeaf:\n", nfiNonLeaf)
 
+
+##########################################################################
 
     #Separating the YANG Tree into 1 branch
     #Edge Contraction also used here --> If the parent and the leaf has similar label, the edge is deleted, then the parent and the child is unified
+    
+    
+    # 입력: leafNode (부모·자식 포인터를 가진 yangdm 클래스 인스턴스)
+    # 동작: leafNode에서 시작해 parent를 따라 루트까지 위로 올라가며 노드들을 Nodes 리스트에 순서대로 넣음
+    # 반환: [현재노드, 부모, 조부모,.., 루트]
+    # ctree 함수는 한 개의 노드(특정행)가 최상단 행(루트)까지 가지는 모든 부모의 경로를 반환한다
     def ctree (leafNode): #leafNode is a yangdm Python Class
         Nodes = list()
-        Nodes.append(leafNode)
-        parentNode = leafNode.parent
+        Nodes.append(leafNode) # 현재 노드
+        parentNode = leafNode.parent # 부모 노드 확인
         while parentNode is not None:
             try:
-                Nodes.append(parentNode)
+                Nodes.append(parentNode) # 부모 노드가 존재시 list에 넣기
             except AttributeError:
                 pass
-            leafNode = leafNode.parent
-            parentNode = parentNode.parent
+            leafNode = leafNode.parent # 기존 부모를 leafNode로 변경
+            parentNode = parentNode.parent # 기존 부모의 부모를 parentNode로 변경
+        
+        # 특정 노드의 부모가 더 이상 없을 때까지 실행
         return Nodes
-    
+   
+
+    # 각 노드별로 최상단 행까지의 모든 부모들을 나타내는 리스트를 개별적으로 작성
     cfiM = list()
     nfiM = list()
     cfiNL = list()
@@ -391,7 +447,21 @@ def mapAttributes(cfiTree,nfiTree):
         
     for j in range(len(nfiNonLeaf)):
         nfiNL.append(ctree(nfiNonLeaf[j]))
-    
+
+    # 각 노드별로 최상단 행까지의 모든 부모를 나타내므로, 모든 리스트의 마지막 값은 동일하다
+    # 예시: cfi LeafNode의 모든 리스트들은 <mapper.yangdm object at 0x7f2f93524f40>로 끝난다.
+    # 예시: nfi LeafNode의 모든 리스트들은 <mapper.yangdm object at 0x7f2f93524ac0>로 끝난다.
+    # cfiM = cfi LeafNode: [[<mapper.yangdm object at 0x7f2f93524f70>, <mapper.yangdm object at 0x7f2f93524f40>], [<mapper.yangdm object at 0x7f2f93524ee0>, <mapper.yangdm object at 0x7f2f93524f40>],...]
+    # nfiM = nfi LeafNode: [[<mapper.yangdm object at 0x7f2f93524fd0>, <mapper.yangdm object at 0x7f2f93524ac0>], [<mapper.yangdm object at 0x7f2f93524760>, <mapper.yangdm object at 0x7f2f93524ac0>],...]
+    # cfiNL = cfi NonLeafNode: [[<mapper.yangdm object at 0x7f2f93524f40>], [<mapper.yangdm object at 0x7f2f93524880>, <mapper.yangdm object at 0x7f2f93524f40>], [<mapper.yangdm object at 0x7f2f93524eb0>, <mapper.yangdm object at 0x7f2f93524880>, <mapper.yangdm object at 0x7f2f93524f40>],...]
+    # nfiNL = nfi NonLeafNode: [[<mapper.yangdm object at 0x7f2f93524ac0>], [<mapper.yangdm object at 0x7f2f93550100>, <mapper.yangdm object at 0x7f2f93524ac0>], [<mapper.yangdm object at 0x7f2f935501c0>, <mapper.yangdm object at 0x7f2f93550100>, <mapper.yangdm object at 0x7f2f93524ac0>],...]
+
+    print("cfi LeafNode (List):\n", cfiM)
+    print("nfi LeafNode (List):\n", nfiM)
+    print("cfi NonLeafNode (List):\n", cfiNL)
+    print("nfi NonLeafNode (List):\n", nfiNL)
+
+
     def getChild(parent):
         allChild = []
         for child in parent.child:
@@ -403,25 +473,48 @@ def mapAttributes(cfiTree,nfiTree):
         return allChild
     
 
+    # 각 노드 집합의 개수는 동일함
+    # len(cfiLeaf) == len(cfiM)
+    # len(nfiLeaf) == len(nfiM)
+    # len(cfiNonLeaf) == len(cfiNL)
+    # len(nfiNonLeaf) == len(nfiNL)
+
 
     #MAPPING THE NON LEAF
     parentMap = {}
     for w in range(len(cfiNonLeaf)):
+        print(w, cfiNonLeaf(w))
         distance = list()
-        for x in reversed(cfiNL[w]):
+
+        for x in reversed(cfiNL[w]): # 경로 리스트를 뒤집어서 루트부터 순회
+            # 리스트의 맨 처음은 x.parent = None
+            # 그 다음부터 x.parent 존재 
             if x.parent is None:
+                # 맨 처음에 부모 없는 루트 노드에서 WeirdNode의 인스턴스 생성
+                # A = <mapper.WeirdNode object at 0x7fe432870100>
                 A = WeirdNode(x.tag)
             else:
-                A.addkid(WeirdNode(x.tag))
+                # addkid()로 처음에 만들어진 WeirdNode 인스턴스 안의 my_children 리스트에
+                # 추가 생성되는 객체들 저장
+                A.addkid(WeirdNode(x.tag)) # 자식을 붙임
+            print(A.my_children)
+
+
+        # cfiNonLeaf: 단일 행의 yangdm 객체
+        # cfiNL: 부모 객체까지 포함한 리스트 형태
+
+        # for문의 맨 처음 노드는 부모가 없어서 else로 넘어간다. 그 뒤는 부모가 다 존재한다.
+        # 선택된 cfiNonLeaf 노드에 부모가 있는 경우
         if cfiNonLeaf[w].parent is not None:
             minDistances = {}
-            #print(cfiNonLeaf[w].tag)
+            print("name:", cfiNonLeaf[w].tag)
+
             for x in parentMap[cfiNonLeaf[w].parent]:
-                #print(cfiNonLeaf[i].tag, cfiNonLeaf[i].parent.tag, x.tag)
+                print(cfiNonLeaf[i].tag, cfiNonLeaf[i].parent.tag, x.tag)
                 nfiPair = getChild(x)
                 nfiPair.insert(0,nfiPair[0].parent)
                 distance=[]
-    
+
                 for j in range(len(nfiPair)):
                     F=''
                     for y in reversed(ctree(nfiPair[j])):
@@ -430,29 +523,60 @@ def mapAttributes(cfiTree,nfiTree):
                             B = WeirdNode(y.tag)
                         else:
                             B.addkid(WeirdNode(y.tag))
+
+                    # Leaf일 때는 거리값에 10000을 넣어서 최솟값 경쟁에서 제외
                     if nfiPair[j].isLeaf:
+                        # 특정 후보가 리프(Leaf)인 경우
                         distance.append(10000)
                     else:
+                        # 리프(Leaf)가 아닌 경우
+                        # Zhang–Shasha Tree Edit Distance (장샤샤 알고리즘 거리 계산)
+                        '''
+                        zss.simple_distance(A, B, get_children=zss.Node.get_distance, get_label=zss.Node.get_label, label_dist=strdist)
+                        Computes the exact tree edit distance between trees A and B. Provides a simplified interface for use when insert/remove cost is equivalent to updating a node from/to an empty label.
+
+                        Parameters:	
+                        A: The root of a tree.
+                        B: The root of a tree.
+                        get_children: A function get_children(node) == [node children]. Defaults to zss.Node.get_children().
+                        get_label: A function get_label(node) == 'node label'.All labels are assumed to be strings at this time. Defaults to zss.Node.get_label().
+                        label_distance: A function label_distance((get_label(node1), get_label(node2)) >= 0. This function should take the output of get_label(node) and return an integer greater or equal to 0 representing how many edits to transform the label of node1 into the label of node2. By default, this is string edit distance (if available). 0 indicates that the labels are the same. A number N represent it takes N changes to transform one label into the other.
+                        Returns: An integer distance [0, inf+)
+                        '''
                         distance.append(int(simple_distance(A, B, WeirdNode.get_children, WeirdNode.get_label, weird_dist)))
                 index = [i for i, x in enumerate(distance) if x == min(distance)]
+
+
                 for i in index:
                     minDistances[nfiPair[i]] = min(distance)
+
             min_val = min(minDistances.values())
             index = [k for k, x in minDistances.items() if x == min_val]
             parentMap[cfiNonLeaf[w]] = [k for k in index]
+
         else:
+            # 선택된 cfiNonLeaf 노드에 부모가 없을 때 (for문 맨 처음부분)
             for j in range(len(nfiNonLeaf)):
+                # reversed(nfiNL[j])는 nfiNL[j]번째의 리스트를 가져와서, 맨 뒤에부터 값을 하나씩 꺼낸다. 
+                # 예시: y = <mapper.yangdm object at 0x7f276e2af370>
                 for y in reversed(nfiNL[j]):
+                    
+                    # nfi의 노드에 부모가 있는지 확인
                     if y.parent is None:
                         B = WeirdNode(y.tag)
                     else:
                         B.addkid(WeirdNode(y.tag))
+
+                # Zhang–Shasha Tree Edit Distance (장샤샤 알고리즘 거리 계산)
                 distance.append(int(simple_distance(A, B, WeirdNode.get_children, WeirdNode.get_label, weird_dist)))
     
+
             index, value = min(enumerate(distance), key=operator.itemgetter(1))
             index = [i for i, x in enumerate(distance) if x == min(distance)]
             parentMap[cfiNonLeaf[w]]= [nfiNonLeaf[k] for k in index]
     
+
+
     finalMap = {}
     res = {}
     for w in range(len(cfiLeaf)):
