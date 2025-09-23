@@ -585,15 +585,16 @@ def mapAttributes(cfiTree,nfiTree):
     
         cfiM = ctree(current)
         nfiparents = parentMap[current.parent]
+        
         for x in reversed(cfiM):
             if x.parent is None:
                 A = WeirdNode(x.tag)
             else:
                 A.addkid(WeirdNode(x.tag))
+        
         for nfiparent in (nfiparents):
             distance=[]
             nfiPair = getChild(nfiparent)
-    
     
             for j in range(len(nfiPair)):
                 nfiM = ctree(nfiPair[j])
@@ -612,9 +613,11 @@ def mapAttributes(cfiTree,nfiTree):
         min_val = min(minDistances.values())
         index = [k for k, x in minDistances.items() if x == min_val]
         finalMap[current] = [i for i in index]
+    
         for i in index:
             if current in res:
                 res[current].append(i)
             else:
                 res[current] = [i]
+    
     return res
