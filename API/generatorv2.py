@@ -104,7 +104,6 @@ def coverSetNSF(convertedData):
     for key,value in convertedData.items(): 
         capMap = ""
 
-
         if key in capDict:
             capMap = capDict[key]
 
@@ -410,24 +409,38 @@ def gen(xml):
     # ietf_i2nsf_nsf_facing_interface()는 bindingNFI4.py안에 있는 클래스로 여기서 인스턴스 nfi 생성
     nfi = ietf_i2nsf_nsf_facing_interface()
 
-    print("\n● nfi:")
-    print(nfi)
-    print("--------------------------------")
 
+
+
+
+    # coverSetNSF(convMongo) 함수에서 각 NSF별로 적용할 정책(provisioning)을 만듦
     provisioning = coverSetNSF(convMongo)
+    '''
+    ● Provisioning:
+    OrderedDict([('firewall', {'/i2nsf-security-policy/name': 'policy', '/i2nsf-security-policy/rules/name': 'rule', '/i2nsf-security-policy/rules/condition/ipv4/destination-ipv4-range': '192.168.18.137 192.168.18.137',
+    '/i2nsf-security-policy/rules/condition/tcp/destination-port-number/port-numbers': '80 80', '/i2nsf-security-policy/rules/action/packet-action/ingress-action': 'drop'})])
+    '''
     print("\n● Provisioning:")
     print(provisioning)
     print("--------------------------------")
     
-    
+
     # CFI → NFI 변환된 low-level 데이터(provisioning)를 실제 pyangbind 객체(nfi)에 채워 넣고, 그 결과를 XML 문자열로 직렬화해서 반환하는 함수
     # nfi: pyangbind로 생성된 NSF-facing interface(NFI) 파이썬 객체. (즉, bindingNFI4.py에서 가져온 최상위 클래스 인스턴스)
     # provisioning: 번역된 정책 데이터. (보통 dict 형태; NSF 이름을 key로, path-value 쌍을 담은 low-level policy를 value로 가짐)
+    
+    # generate(nfi, provisioning) 함수에서 실제로 각 NSF별 저수준 정책(NFI 모델 기반 XML 등)으로 변환
+    # 즉, 실제 변환 로직은 coverSetNSF()와 generate() 함수 내부에서 이루어집니다. 
+    # 특히 generate() 함수가 NSF별로 저수준 정책(XML 등)을 생성하는 핵심 함수입니다.
+    # 이 함수에서 NSF별로 "drop" → 실제 장비가 이해할 수 있는 정책(XML, 명령어 등)으로 매핑됩니다.
     result = generate(nfi,provisioning)
     print("\n● result:")
     print(result)
     print("--------------------------------")
     
+
+
+
     if isinstance(result,str):
         return {"ERROR":"NSF not Found"}
     return result
