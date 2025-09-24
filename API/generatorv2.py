@@ -100,17 +100,21 @@ def coverSetNSF(convertedData):
     with open("capabilityMappingv2.json") as f:
         capDict = json.load(f)
 
-    for key,value in convertedData.items():
+
+    for key,value in convertedData.items(): 
         capMap = ""
+
 
         if key in capDict:
             capMap = capDict[key]
+
 
         if key == "/i2nsf-security-policy/rules/condition/icmp/version" and value =="icmpv6":
             icmp = "icmpv6"
         elif key == "/i2nsf-security-policy/rules/condition/icmp/version" and value == "icmpv4":
             icmp = "icmpv4"
         res[key]={}
+
 
         if capMap:
             if (icmp == "icmpv4" and "icmpv6-capability" in capMap):
@@ -129,6 +133,7 @@ def coverSetNSF(convertedData):
         else:
             res[key]["value"] = value
 
+
     i=1
     Subset={}
     for u in Universe:
@@ -145,6 +150,7 @@ def coverSetNSF(convertedData):
                     Subset[x["nsf-name"]]["p"]=10
                     Subset[x["nsf-name"]]["s"].append(u)
                     i+=1
+
         else:
             #Query to DMS to get the NSF
             key = list(u.keys())[0]
@@ -155,6 +161,7 @@ def coverSetNSF(convertedData):
             generateQuery(rpc_input,data)
             capabilityQuery = pybindIETFXMLEncoder.serialise(rpc_input).replace("input","nsf-capability-registration")
             queryResult = query.query(capabilityQuery)
+
             if queryResult == "NSF Not Found":
                 return f"Cannot find NSF with {u}"
             else:
@@ -215,6 +222,9 @@ def coverSetNSF(convertedData):
     #end = datetime.now()
     #time = end - start
     return result#, time)
+
+
+
 
 def generateQuery(nfi,data):
     for path,value in data.items():
@@ -311,13 +321,46 @@ def gen(xml):
     consumer = DFAAPI.dfa_construction('DataModel/cfi_dm.txt') # YANG 데이터 모델 정의 기반 DFA 생성
     resInfo, resData = DFAAPI.extract_data(xml,consumer[0],consumer[1]) # cfi_dm.txt 기반 노드 정의 리스트 기반, XML의 값에서 cfi_dm.txt 기반 노드 정의 리스트에 해당되는 값이 있으면 빈 resData 리스트에 값 추가
 
-    # resInfo: cfi_dm.txt 기반 노드 정의 리스트(토큰 테이블 기반)  
+
+    # resInfo: cfi_dm.txt 기반 노드 정의 리스트(토큰 테이블 기반)
+    '''
+    ● resInfo:
+    [[False, 1, 'name', True, 1],
+     [False, 1, 'language', True, 2],
+     [False, 1, 'resolution-strategy', True, 3],
+     [False, 2, 'name', True, 5],
+     [False, 2, 'priority', True, 6],
+     [False, 3, 'system-event', True, 8],
+     [False, 3, 'system-alarm', True, 9],
+     [False, 4, 'source', True, 12],
+     [False, 4, 'destination', True, 13],
+     [False, 4, 'transport-layer-protocol', True, 14],
+     [False, 5, 'start', True, 16],
+     [False, 5, 'end', True, 17],
+     ...]
+    '''
     print("\n● resInfo:")
     pprint(resInfo, indent=2)
     print("--------------------------------")
     
+
     # resData: XML에서 실제 추출된 값들의 리스트(빈 리스트)
-    # len(resInfo) == len(resData)
+    '''
+    ● resData:
+    [['policy'],
+     [],
+     [],
+     ['rule'],
+     [],
+     [],
+     [],
+     [],
+     ['webserver'],
+     ['tcp'],
+     [80],
+     [80],
+     ...]
+    '''
     print("\n● resData:")
     pprint(resData, indent=2)
     print("--------------------------------")
@@ -326,8 +369,8 @@ def gen(xml):
         return {"Error": "Grammar Error"}
       
     
-    # 
     highData = {}
+    # len(resInfo) == len(resData)
     for x in range(len(resInfo)):
         if resData[x]: # resData 노드에 값이 있으면 처리, 없으면 건너뜀.
             if len(resData[x])>1:
@@ -336,13 +379,26 @@ def gen(xml):
             else:
                 highData[resInfo[x][4]] = resData[x][0] # 값이 하나만 있으면 단일 값만 저장
             
+
     print("\n● highData:")
-    pprint(highData, indent=2)
+    pprint(highData, indent=2) # highData 예시: {1: 'policy', 5: 'rule', 13: 'webserver', 14: 'tcp', 16: 80, 17: 80, 71: 'drop'}
     print("--------------------------------")
     
 
     # convMongo는 I2NSF 웹페이지의 configuration에서 선택해서 submit된 값들을 i2nsf-security-policy 기반의 dictionary 형태로 반환
     convMongo = convertMongo(highData)
+
+    # convMongo 예시:
+    '''
+    # OrderedDict는 순서가 보장되는 Dictionary로 아래의 두 개는 동일한 표현이다
+    # ('/i2nsf-security-policy/name', 'policy')
+    # '/i2nsf-security-policy/name' : 'policy'
+
+    convMongo = 
+    OrderedDict([('/i2nsf-security-policy/name', 'policy'), ('/i2nsf-security-policy/rules/name', 'rule'), ('/i2nsf-security-policy/rules/condition/ipv4/destination-ipv4-range', '192.168.18.137 192.168.18.137'),
+                 ('/i2nsf-security-policy/rules/condition/tcp/destination-port-number/port-numbers', '80 80'), ('/i2nsf-security-policy/rules/action/packet-action/ingress-action', 'drop')])
+    '''
+
 
     # ~/i2nsf-security-controller/API/generate_bindings.sh로 bindingNFI4.py , bindingCFI.py 자동 생성
     # bindingNFI4.py → NSF-Facing Interface(NFI): 실제 장비/NSF에 가까운 저수준 정책 모델
@@ -351,7 +407,7 @@ def gen(xml):
     # bindingCFI.py → Consumer/Customer-Facing Interface(CFI): 사람이 이해하기 쉬운 고수준 정책 모델
     # 이 클래스는 YANG 모듈 ietf-i2nsf-cfi-policy에서 PYANG용 PythonClass 플러그인에 의해 /i2nsf-cfi-policy/rules/event 경로를 기반으로 자동 생성
 
-    # ietf_i2nsf_nsf_facing_interface()는 bindingNFI4.py안에 있는 함수 (자동 생성 함수)
+    # ietf_i2nsf_nsf_facing_interface()는 bindingNFI4.py안에 있는 클래스로 여기서 인스턴스 nfi 생성
     nfi = ietf_i2nsf_nsf_facing_interface()
 
     print("\n● nfi:")

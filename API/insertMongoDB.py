@@ -34,6 +34,7 @@ with open("capabilityPath.json") as f:
 # ★ MongoDB에서 consumer facing interface(CFI) ID와 NSF-facing-interface(NFI) ID를 서로 Mapping시킴
 i2nsfMongoDB.insertAttributesMap('DataModel/cfi_minus.txt','DataModel/nfi.txt')
 
+
 #INSERT CAPABILITY
 # i = 0
 # for filename in os.listdir("capability"):

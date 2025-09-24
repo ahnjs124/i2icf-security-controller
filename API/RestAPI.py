@@ -60,6 +60,10 @@ CORS(api)
 # 데코레이터에 설정된 요청이 react에서 들어오면 아래 함수가 실행됨 (Flask 인스턴스의 이름이 api이므로 @api.route로 데코레이터 설정)
 
 
+
+
+
+
 #### URL group
 @api.route('/url/get', methods = ['GET'])
 def restGetURLGroup():
@@ -123,8 +127,9 @@ def restGetUserGroup():
     db = client["endpoint"]
     col = db["user"]
     query = request.json
-    res = col.find_one(query)
+    res = col.find_one(query) # find_one은 query 기반으로 일치하는 document 1개 찾기
     return res
+
 
 @api.route('/user/put', methods = ['PUT'])
 def restInsertUserGroup():
@@ -133,8 +138,7 @@ def restInsertUserGroup():
         client = pymongo.MongoClient(f"mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["user"]
-        
-        res = col.insert_one(data)
+        res = col.insert_one(data) # insert_one은 해당 data를 mongo의 endpoint 데이터베이스의 user 컬렉션에 입력
         return "Success"
     except pymongo.errors.DuplicateKeyError:
         return "Duplicate Key for ",data["name"]

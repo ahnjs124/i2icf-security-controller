@@ -37,30 +37,39 @@ def getURLGroup(key):
     res = col.find_one(query)
     return res
 
+
 # Register user-group to MongoDB
-# Data Model: {"name": string, "mac-address": [yang:mac-address], "range-ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "range-ipv6-address": {"start": ipv6-address, "end": ipv6-address}}
+# 입력 data = {"name": string, "mac-address": [yang:mac-address], "range-ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "range-ipv6-address": {"start": ipv6-address, "end": ipv6-address}}
 def insertUserGroup(data):
     try:
         client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         db = client["endpoint"]
         col = db["user"]
         
-        res = col.insert_one(data)
+        # 데이터 insert시 입력 데이터 형태는 그대로 들어옴
+        # mongo의 컬렉션에 insert_one()시 "_id" : ObjectId(~)만 추가로 맨 앞에 붙음
+        res = col.insert_one(data) 
         return res
+
     except pymongo.errors.DuplicateKeyError:
         print("Duplicate Key for ",data["name"])
+
+
 
 def getUserGroup(key):
     client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     db = client["endpoint"]
     col = db["user"]
     
-    query = {"name":key}
-    res = col.find_one(query)
+    query = {"name":key} 
+    res = col.find_one(query) # mongo의 endpoint 데이터베이스의 user 컬렉션에서 {"name":key}에 해당하는 document 1개를 검색
     return res
 
+
+
+
 # Register user-group to MongoDB
-# Data Model: {"name": string, "mac-address": [yang:mac-address], "range-ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "range-ipv6-address": {"start": ipv6-address, "end": ipv6-address}}
+# 입력 data = {"name": string, "mac-address": [yang:mac-address], "range-ipv4-address": {"start": ipv4-address,"end": ipv4-address}, "range-ipv6-address": {"start": ipv6-address, "end": ipv6-address}}
 def insertDeviceGroup(data):
     try:
         client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
@@ -131,12 +140,13 @@ def insertAttributesMap(cfiTree,nfiTree):
 
 def getAttributesMap(cfiID):
     client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
-    db = client["endpoint"]
-    col = db["mapping"]
+    db = client["endpoint"] # "endpoint" 데이터베이스 선택
+    col = db["mapping"] # "endpoint"에서 "mapping" 컬렉션 선택
     
-    query = {"cfiID":cfiID}
-    res = col.find_one(query)
-    return res
+    query = {"cfiID":cfiID} # "mapping" 컬렉션에서 가져올 field 선택
+    res = col.find_one(query) # 해당 field가 있는 document를 컬렉션에서 선택
+    return res # 해당 document를 return 
+
 
 #Register NSF Capability, parameter in Python Diction / JSON, Pattern:
 # {'nsf-name': string, "nsf-capability-info": Follow-Registration-Data-Model, "nsf-access-info": Follow-Registration-Data-Model}
