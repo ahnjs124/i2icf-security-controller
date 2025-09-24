@@ -252,7 +252,7 @@ def generateQuery(nfi,data):
 
 
 
-def generate(nfi,provisioning):
+def generate(nfi,provisioning): 
     res = {}
     # Reset the NSF-facing interface object to ensure a clean state before generating new provisioning data
     nfi._unset_i2nsf_security_policy() # nfi 객체 안에 들어있는 기존 <i2nsf-security-policy> 내용을 비워서 빈 상태로 만듬
@@ -414,12 +414,25 @@ def gen(xml):
 
 
     # coverSetNSF(convMongo) 함수에서 각 NSF별로 적용할 정책(provisioning)을 만듦
+    '''
+    coverSetNSF(convMongo) 함수는 고수준 정책(convMongo)을 기반으로
+    "어떤 NSF(예: firewall, web-filtering 등)에 어떤 정책을 적용할지"를 자동으로 선택(매핑)하는 역할을 합니다.
+
+    즉, 각 정책 항목이 어떤 NSF의 capability(기능)에 해당하는지 검사하고,
+    여러 NSF가 있을 경우 최적의 조합(최소 비용, 모든 정책을 커버하는 NSF 집합 등)을 계산해서,
+    NSF별로 실제로 적용할 정책 묶음을 만들어 반환합니다.
+    결과적으로, coverSetNSF 함수에서 NSF 선택 및 매핑이 이루어집니다.
+    '''
+
+    #  coverSetNSF 함수에서 NSF 선택 및 매핑이 이루어집니다.
     provisioning = coverSetNSF(convMongo)
     '''
     ● Provisioning:
     OrderedDict([('firewall', {'/i2nsf-security-policy/name': 'policy', '/i2nsf-security-policy/rules/name': 'rule', '/i2nsf-security-policy/rules/condition/ipv4/destination-ipv4-range': '192.168.18.137 192.168.18.137',
     '/i2nsf-security-policy/rules/condition/tcp/destination-port-number/port-numbers': '80 80', '/i2nsf-security-policy/rules/action/packet-action/ingress-action': 'drop'})])
     '''
+
+    # provisioning = "선택된 NSF들 각각에 실제로 배포해야 할 정책 설정 묶음"
     print("\n● Provisioning:")
     print(provisioning)
     print("--------------------------------")
