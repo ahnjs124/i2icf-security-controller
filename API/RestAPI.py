@@ -303,6 +303,7 @@ def restInsertConfiguration():
         # target="running" : ConfD의 “running datastore”에 설정 적용
         # config=configuration : 위에서 만든 XML을 넘겨줌
         confd_configuration = confd_manager.edit_config(target="running",config = configuration)
+        print(confd_configuration.xml)
         
         # NETCONF 세션 종료
         confd_manager.close_session()
